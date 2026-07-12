@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Editor / OS cruft
+*.swp
+*~
+Thumbs.db
+
+# Obsidian 本机配置(窗口布局/最近打开等易变项,不跨机共享)
+.obsidian/

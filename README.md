@@ -1,6 +1,6 @@
 # Minion Knowledge Base
 
-> **任何 AI:读完本 README 你就知道怎么使用和维护这个 KB。这里是 Owner(Sunny)所有 AI 共享的唯一记忆源。**
+> **任何 AI:读完本 README 你就知道怎么使用和维护这个 KB。这里是 Owner(Kun)所有 AI 共享的唯一记忆源。**
 > 格式:[OKF v0.1](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing) · 模式:[karpathy LLM wiki](https://github.com/Astro-Han/karpathy-llm-wiki)(raw→wiki 编译,综合发生在摄入时)
 
 ## 结构
@@ -14,8 +14,12 @@ wiki/projects/        项目上下文(架构决策、lessons learned)
 wiki/knowledge/       通用知识页
 index.md              全局目录 —— 查找先从这里进
 log.md                操作日志 —— 每次写入追加一行
-skills/               四个操作的完整规程(本 README 是摘要,细节以 skills 为准)
+AGENTS.md / CLAUDE.md agent 入口 —— progressive onboarding:只 load 核心纪律 + 「何时读什么」指针表,其余按需(非 wiki 页)
+skills/               权威 skill 原文 —— kb-ingest/query/remember/lint + awake(本 README 是摘要,细节以 skills 为准)
+.claude/skills/       桌面 Claude Code 的发现入口 —— 指向 ../../skills/<name> 的 symlink,单一权威、无拷贝
 ```
+
+> **skills 两条路径、同一份文件**:桌面 Claude Code 从 `.claude/skills/` 自动加载(可 `/kb-ingest` 触发);手机/connector/无 harness 环境直接读 `skills/<name>/SKILL.md` 照做——行为一致。symlink 仅是桌面发现入口,web/connector 看的是 `skills/` 真文件,不依赖它。
 
 ★ = **指令层**:影响 AI 之后的所有行为。**任何改动必须先向 Owner 展示 diff,确认后才能写入。**
 
@@ -39,6 +43,7 @@ resource: https://...        # 来源溯源(没有则省略)
 tags: [nextjs]
 timestamp: 2026-07-08T10:00:00Z   # 最后更新时间
 replaces: [wiki/knowledge/old.md] # 可选:本页取代旧页
+scope: personal | amazon          # 可选(conventions 用):amazon=仅干 Amazon 活时才 load,个人项目不必读
 ---
 ```
 
@@ -49,10 +54,13 @@ replaces: [wiki/knowledge/old.md] # 可选:本页取代旧页
 1. 指令层(preferences/conventions/goals)未经 Owner 确认不得写入。
 2. raw/ 只增不改;进 wiki 的外部内容必须经过 Owner 当场审核。
 3. 每次写入:更新受影响的 `index.md` 条目 + 在 `log.md` 追加一行(`日期 | 操作 | 路径 | 摘要`)。
+   - **commit 看本次改动整体**:本次只动 `projects/`、`knowledge/` → auto commit;一旦触及指令层(preferences/conventions/goals)或策略文件(PRD/README/AGENTS/CLAUDE/SKILL),整批(含连带的 index/log/.gitignore)须 **Owner 明说「可以 commit」才 commit**。
+   - **push 永不自行做**——任何情况下都等 Owner 明确指示。
+   - 手机端(GitHub connector):write == commit,写即提交;指令层/策略文件在获 Owner commit 指示前不写。
 4. 回答问题必须引用到页;KB 里没有就说没有,不编造。
 5. 一页被 `replaces` 取代后:从 index.md 摘除,文件保留(git 即历史)。
 6. 发现矛盾不要静默择一:ingest/remember 时当场问 Owner,query 时把两说都摆出来并指出矛盾。
 
 ## 没有 skill 加载能力的环境(手机 Claude / GPT / 任意 agent)
 
-通过 GitHub connector/API 访问本 repo(private),先读本 README 和对应 `skills/*/SKILL.md`,然后照规程执行——skill 即文档,行为应与桌面端完全一致。
+通过 GitHub connector/API 访问本 repo(private),先读本 README 和对应 `skills/*/SKILL.md`,照规程执行——skill 即文档,行为应与桌面端完全一致。若你要编排多个子代理,再读 `wiki/conventions/agent-orchestration.md`。

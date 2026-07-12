@@ -20,7 +20,7 @@ description: Ingest external content (URL, file, or pasted text) into the knowle
    - 原文 → `raw/YYYY/MM/<slug>.md`(frontmatter: type: raw, resource: 原 URL)
    - 草稿 → 对应 wiki 页(新建或追加)
    - 更新 `index.md` + `log.md` 追加一行
-   - 一次 git commit:`kb: ingest <slug>`
+   - **commit(看整体)**:本次只落进 `projects/`、`knowledge/` → 可直接 commit;一旦触及指令层(preferences/conventions/goals)或策略文件(PRD/README/AGENTS/CLAUDE/SKILL),整批须 Owner 明说「可以 commit」后才 commit。任何情况下**永不自行 push**。
 5. **Owner 拒绝或要求修改**:修改后重新审核;整体拒绝则**不写任何文件**。
 
 ## 铁律

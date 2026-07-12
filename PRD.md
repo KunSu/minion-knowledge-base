@@ -2,11 +2,11 @@
 
 > v2.1:ingest 改为「当场审核、原子落盘」,砍掉 candidates/、trust 字段、kb-review skill;supersedes 更名 replaces。
 > v1.0 全量设计(server/索引/多用户)存档于 `MEMORY_DESIGN.md`,作未来蓝图,MVP 不实现。
-> 2026-07-08 · Owner: Sunny
+> 2026-07-08 · Owner: Kun
 
 ## 1. 愿景(不变)
 
-所有 AI(Claude Code / Codex / Cursor / ChatGPT)共享同一份 Memory,用户永不重复介绍自己的背景、偏好、项目。用户只负责扔内容,第二大脑自己维护自己。
+所有 AI(Claude Code / Codex / Cursor / ChatGPT)共享同一份 Memory,用户永不重复介绍自己的背景、偏好、项目。用户只负责扔内容,第二大脑自己维护自己。任何 AI 直接读本 repo(入口 `CLAUDE.md` / `AGENTS.md` → `README.md`)即可上手,无需额外的权威源约定。
 
 ## 2. MVP 定义:只做两件事
 
@@ -27,8 +27,14 @@ minion-knowledge-base/
 │   └── knowledge/        # 通用知识,AI 自由写
 ├── index.md              # 全局目录(渐进导航入口,机器维护)
 ├── log.md                # append-only 操作日志(机器维护)
-└── skills/               # kb-* 四个 skill(repo 自包含;手机场景直接读这些文件照做)
+├── AGENTS.md / CLAUDE.md # agent 入口:progressive onboarding——只无条件 load 核心纪律 + 「何时读什么」指针表,其余按需(非 wiki 页,无 OKF frontmatter)
+├── skills/               # 权威 skill 原文(repo 自包含;手机/无 harness 场景直接读这些文件照做)
+│   ├── kb-ingest|query|remember|lint/   # KB 四个核心操作
+│   └── awake/            # 日常自用 skill(含 keep_awake.sh)
+└── .claude/skills/       # 桌面 Claude Code 的项目级发现入口——每个是指向 ../../skills/<name> 的 symlink(单一权威,无拷贝)
 ```
+
+> **skills 两条发现路径,同一份文件**:能加载 skill 的桌面 harness(Claude Code)从 `.claude/skills/` 自动发现(可 `/kb-ingest` 斜杠触发);无此能力的环境(手机 Claude/GPT/GitHub connector/Windows)直接读 `skills/<name>/SKILL.md` 照做——**两条路径行为一致**。symlink 在 Unix/macOS clone 会还原;GitHub web/connector 与 Windows 看到的是 `skills/` 真文件(不依赖 symlink),照样能 follow 相同流程。
 
 **格式:OKF v0.1 合规。** frontmatter = 标准字段 + 一个扩展:
 
@@ -41,10 +47,13 @@ resource: https://...        # 溯源(raw 的原始 URL / 知识页的来源引�
 tags: [nextjs]
 timestamp: 2026-07-08T10:00:00Z
 replaces: [路径]             # 可选:本页取代旧页(偏好演进);被取代页从 index 摘除,git 保留历史
+scope: personal | amazon    # 可选(仅 conventions 用):personal=所有个人项目通用;amazon=仅干 Amazon 活时才 load,做个人项目不必读
 ---
 ```
 
 路径即身份;页面互链用普通 markdown 链接;版本史 = git;检索 = grep + index 导航,无向量库。
+
+**`scope` 是 OKF 之外的自定义扩展**,用于 progressive 加载:标 `scope: amazon` 的页只在处理 Amazon 相关任务时才读,平时省 context。个人项目默认只看 `personal`(或不带 scope)的页。
 
 ## 4. Skills(全部交互,共 4 个)
 
@@ -63,11 +72,11 @@ replaces: [路径]             # 可选:本页取代旧页(偏好演进);被取�
 - **AI 自由写**:`wiki/projects|knowledge/`;`raw/` 只可追加不可修改
 - **机器维护**:`index.md`、`log.md`
 - **外部内容进 wiki 的唯一通路**:kb-ingest 的当场审核;审核不过,一个字节都不落盘
-- 每次写入更新 log.md 一行;git commit 由 AI 会话正常提交
+- 每次写入更新 log.md 一行;**commit 以「本次改动整体」判定**:本次只涉及 `projects/`、`knowledge/` → auto commit;一旦触及指令层(preferences/conventions/goals)或策略文件(PRD/README/AGENTS/CLAUDE/SKILL),整批(含连带的 index/log/.gitignore)须 Owner 明说「可以 commit」后才 commit——我让你 commit 才 commit;**push 永不自行做**
 
 ## 6. 手机访问(零建设)
 
-手机版 Claude(或 GPT)接 **GitHub connector** 读写同一个 private repo:query = 读文件,remember = commit 写回。skills 即文档——手机上第一句说「读 `skills/kb-query.md` 然后照着查 X」,或把 kb 规则放进一个 Claude Project 的 instructions。repo 必须 private(个人记忆),connector 授权后访问 private repo 无障碍。
+手机版 Claude(或 GPT)接 **GitHub connector** 读写同一个 private repo:query = 读文件,remember = commit 写回。**手机端 write == commit(设计如此)**:connector 下写文件本身就是一次 commit,没有「先落盘、稍后再 commit」的中间态。规则统一为「Owner 让 commit 才 commit」:非指令层(projects/knowledge)写即 commit(视为预授权);指令层/策略文件在手机端未获 Owner 明确 commit 指示前**不写**(因为写就等于提交);push 仍不自行做。skills 即文档——手机上第一句说「读 `skills/kb-query.md` 然后照着查 X」,或把 kb 规则放进一个 Claude Project 的 instructions。repo 必须 private(个人记忆),connector 授权后访问 private repo 无障碍。
 
 ## 7. 交付物与验收
 

@@ -18,7 +18,7 @@ description: Persist a lesson, decision, or preference from the current conversa
    - **指令层(★)**:先展示完整 diff(新页展示全文),Owner 确认后才写
    - 非指令层:直接写,但回复中说明写了什么、写到哪
 4. **矛盾处理**:与现有页矛盾时当场问 Owner;新内容取代旧内容则在新页 frontmatter 标 `replaces: [旧页路径]` 并从 index.md 摘除旧页条目。
-5. **收尾**:更新 `index.md` 受影响条目 + `log.md` 追加一行;git commit:`kb: remember <slug>`。
+5. **收尾**:更新 `index.md` 受影响条目 + `log.md` 追加一行;**commit(看整体)**——本次只写 `projects/`、`knowledge/` → 直接 commit;触及指令层(preferences/conventions/goals)或策略文件 → 整批须 Owner 明说「可以 commit」后才 commit。任何情况下**永不自行 push**。
 
 ## 铁律
 
