@@ -42,3 +42,7 @@
 2026-07-12 | edit | wiki/conventions/amazon-workflow.md | scope: company → amazon;顶部注明仅干 Amazon 活时才 load
 2026-07-12 | edit | .gitignore | 忽略 .obsidian/(本机 Obsidian 配置,不跨机共享)
 2026-07-12 | edit | skills/awake/SKILL.md | 多机说明:脚本随 KB 走,以本 skill 目录下 keep_awake.sh 为准
+2026-08-03 | create | base/, scripts/init.sh | 建立全局配置源:base/CLAUDE.md(由 wiki/preferences 编译,新增工程偏好+开发工作流两节)+ base/commands/(brain/idea/general-review);init.sh 幂等逐文件 symlink 到 ~/.claude,已安装 9 个链接
+2026-08-03 | create | wiki/projects/minion-brain.md | 首个 project context 页:KB 当大脑 / minion-brain 当被管理的 app 的分工决策 + cwd 决定项目级配置的 lesson
+2026-08-03 | archive | archive/subagents/, archive/commands/ | 停用四子代理编排(SUBAGENTS.md + 4 agents,与 mattpocock skills 编排规则冲突)与自有 /code-review command(与 mattpocock skill 撞名被遮蔽);全局残留已备份删除
+2026-08-03 | edit | index.md | 新增 Base 段与 Projects 段首个条目;多模型编排规范标记为已停用
