@@ -2,6 +2,10 @@
 
 > 全局目录。任何 AI 查找知识从这里进;每次写入后更新对应条目(标题 + 一句话 + 路径)。
 
+## Base(全局配置源 ★指令层)
+
+- [base/](base/README.md) — 分发到 `~/.claude/` 与 `~/.codex/` 的全局配置,对**所有 repo** 生效:`CLAUDE.md` + `AGENTS.md`(全局偏好孪生文件,Claude / Codex 各一入口)+ `commands/`(`/brain` `/idea` `/general-review`)+ `agents/` 与 `codex-agents/`(六角色子代理定义)。装法 `bash scripts/init.sh`(幂等,逐文件 symlink)。开发主力 skills 用 [mattpocock/skills](https://github.com/mattpocock/skills)(外部依赖,装在 `~/.agents/skills/`)
+
 ## Preferences(偏好 ★指令层)
 
 - [沟通偏好](wiki/preferences/communication.md) — 中文、极简直接、逐项过审、当场提问
@@ -10,7 +14,7 @@
 ## Conventions(规范 ★指令层)
 
 **个人 conventions**(Owner 自己的开发,跨所有个人项目):
-- [多模型编排规范](wiki/conventions/agent-orchestration.md) — Fable 编排、四 subagent 分工、工作流链、代理定义要点与 Codex 安装(原文见 raw)
+- [多模型编排规范](wiki/conventions/agent-orchestration.md) — **已恢复并扩展(2026-08-12)**。六角色分层路由,Claude Code + Codex 双侧对等;三档语义映射 + 代际适配方法;Luna leaf-only 与不做 Sol 例行扇出两条硬边界。2026-08-03 的停用原因(与 mattpocock skills 编排叠加有歧义)已解:只分发 agent 定义、不加无条件引用
 
 **公司 conventions**(Amazon 内部环境专用,与个人 conventions 分开):
 - [Amazon 工作规范](wiki/conventions/amazon-workflow.md) — 生产安全铁律、Brazil/CRUX/Coral 等内部系统入口、包容性语言
@@ -21,7 +25,9 @@ _暂无_
 
 ## Projects(项目上下文)
 
-_暂无_
+> 每个 repo 一页,记「为什么存在 / 架构决策 / lessons learned / 与其他项目的关系」。技术栈与构建约定归各 repo 自己的 `CLAUDE.md`。
+
+- [minion-brain](wiki/projects/minion-brain.md) — 第二大脑的 Web App(Next.js+Supabase);与本 KB 的分工决策(KB 当大脑、它当被管理的 app)、`/brain` `/idea` 的后端、四子代理停用记录
 
 ## Knowledge(通用知识)
 
