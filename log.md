@@ -42,6 +42,18 @@
 2026-07-12 | edit | wiki/conventions/amazon-workflow.md | scope: company → amazon;顶部注明仅干 Amazon 活时才 load
 2026-07-12 | edit | .gitignore | 忽略 .obsidian/(本机 Obsidian 配置,不跨机共享)
 2026-07-12 | edit | skills/awake/SKILL.md | 多机说明:脚本随 KB 走,以本 skill 目录下 keep_awake.sh 为准
+2026-07-13 | ingest | raw/2026/07/rednote-openclaw-board.md, raw/2026/07/rednote-openclaw-checklist.json | 小红书 openclaw 收藏夹抓取原文存档(84/91 条,56 clean/28 pending 限流/7 missing)+ 增量 checklist
+2026-07-13 | ingest | wiki/knowledge/rednote-openclaw-ai-signals.md | 从收藏夹精编 Claude/Fable/Codex/Agent 工程情报(编排/skill/第二大脑)
+2026-07-13 | ingest | wiki/knowledge/scrape-logged-in-chrome.md | 连已登录 Chrome 抓取的可复用方法(puppeteer+__INITIAL_STATE__+反爬对策)
+2026-07-13 | edit | index.md | Knowledge 分区填入两个新知识页
+2026-07-13 | ingest | raw/2026/07/rednote-openclaw-board.md, rednote-openclaw-checklist.json | 限流恢复后降速补抓 28 条 pending 全部成功 → 84 条全 clean,回填 raw+checklist
+2026-07-13 | edit | wiki/knowledge/rednote-openclaw-ai-signals.md | 补 OpenClaw 专题章(记忆/安全/省token/必装skills/多agent) + agent memory 前沿 + Harness Engineering;页头状态改为 84 全 clean
+2026-07-13 | edit | raw/2026/07/rednote-openclaw/, wiki/knowledge/rednote-openclaw/ | 按 Owner 要求返工:废弃聚合(删 board 大文件 + 精编页 + 索引),改为每个 note 单独成文——81 条各一个 raw + 一个 wiki,无任何聚合
+2026-07-13 | edit | raw/2026/07/rednote/, wiki/knowledge/rednote/ | 目录 rednote-openclaw → rednote;删 checklist.json;修内部引用
+2026-07-13 | remember | wiki/preferences/engineering.md | 新增「Web 抓取/外部数据采集」偏好(不硬刚反爬/优先__INITIAL_STATE__/连登录Chrome/每个原子单元单独成文)——指令层,已 Owner 批准
+2026-07-13 | edit | 文件名重构 raw/wiki/rednote/ | 去掉 noteId 前缀,改纯标题 slug;noteId 移入 frontmatter id:;重复标题才加短后缀
+2026-07-13 | edit | wiki/preferences/engineering.md, skills/kb-ingest/SKILL.md, AGENTS.md, README.md | 分层返工(调研 Anthropic/Cursor 官方后):撤销 engineering 里放错层的 web 抓取段;「每个原子单元单独成文」移入 kb-ingest 铁律;AGENTS 指针表加抓取场景触发行;README 新增「内容放哪层」分层判据 + id 字段
+2026-07-13 | edit | AGENTS.md | 指针表整体改为「场景词打头」风格(左列=触发场景而非人视角任务名,提升 AI 按需加载命中率)+ 加引导句
 2026-08-03 | create | base/, scripts/init.sh | 建立全局配置源:base/CLAUDE.md(由 wiki/preferences 编译,新增工程偏好+开发工作流两节)+ base/commands/(brain/idea/general-review);init.sh 幂等逐文件 symlink 到 ~/.claude,已安装 9 个链接
 2026-08-03 | create | wiki/projects/minion-brain.md | 首个 project context 页:KB 当大脑 / minion-brain 当被管理的 app 的分工决策 + cwd 决定项目级配置的 lesson
 2026-08-03 | archive | archive/subagents/, archive/commands/ | 停用四子代理编排(SUBAGENTS.md + 4 agents,与 mattpocock skills 编排规则冲突)与自有 /code-review command(与 mattpocock skill 撞名被遮蔽);全局残留已备份删除

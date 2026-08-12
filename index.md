@@ -31,7 +31,8 @@ _暂无_
 
 ## Knowledge(通用知识)
 
-_暂无_
+- [连已登录 Chrome 抓取网站的方法](wiki/knowledge/scrape-logged-in-chrome.md) — puppeteer 连登录态 Chrome、`__INITIAL_STATE__` 提数据、小红书反爬/限流对策(为"自主抓取 agent"沉淀)
+- 小红书 openclaw 收藏夹 — 81 条笔记各自独立成页,见 [wiki/knowledge/rednote/](wiki/knowledge/rednote/)(每条一个 wiki + 一个 raw,主题:Claude/Fable/Codex/Agent skill/harness/OpenClaw/第二大脑/agent memory);原文存档 [raw/2026/07/rednote/](raw/2026/07/rednote/)
 
 ## Skills(操作规程)
 

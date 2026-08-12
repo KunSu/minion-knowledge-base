@@ -12,13 +12,16 @@
 
 ## 按需加载(用到再读,别预加载)
 
-| 你要做什么 | 读这个 |
+左列是**触发场景**(用你当前任务去匹配),命中就读右列;没命中就别读——按需加载,不预载。
+
+| 当任务涉及… | 读这个 |
 |---|---|
-| 了解 KB 结构 / 四个操作 / frontmatter 模板 / 完整铁律 | `README.md` |
-| 执行某个 kb 操作(ingest/query/remember/lint)或 awake | 对应 `skills/<name>/SKILL.md` 完整规程 |
-| 编排多个 subagent(何时派 deep-reasoner/peer-review/fast-worker/verifier) | `wiki/conventions/agent-orchestration.md` |
-| 需要 Owner 的工程偏好 / 沟通偏好 / 目标 / 项目上下文 | 从 `index.md` 导航到对应 wiki 页 |
-| 干 **Amazon 相关**的活(AWS/Brazil/内部系统) | `wiki/conventions/amazon-workflow.md`(`scope: amazon`)|
+| 想搞清 **KB 怎么用 / 结构 / 内容放哪层 / frontmatter 模板 / 完整铁律** | `README.md` |
+| **摄入/保存外部内容、查 KB、沉淀 lesson、体检 KB**(ingest / query / remember / lint),或 `@awake` | 对应 `skills/<name>/SKILL.md` 完整规程 |
+| **派子代理 / 并行分工 / 多模型编排**(deep-reasoner / peer-review / fast-worker / verifier / Fable 编排) | `wiki/conventions/agent-orchestration.md` |
+| 需要 **Owner 的工程偏好 / 沟通风格 / 长期目标 / 某项目上下文** | 从 `index.md` 导航到对应 wiki 页 |
+| **Amazon 相关**:AWS / Brazil / CRUX / Coral / 内部系统 / 生产安全 | `wiki/conventions/amazon-workflow.md`(`scope: amazon`)|
+| **抓网页 / 爬虫 / 解析 HTML / 反爬限流 / 连已登录浏览器 / 小红书 rednote** | `wiki/knowledge/scrape-logged-in-chrome.md` |
 
 > **scope 加载规则**:标 `scope: amazon` 的页**只在处理 Amazon 任务时才读**,做个人项目不必加载(省 context)。其余页(personal 或不带 scope)按上表按需读。
 

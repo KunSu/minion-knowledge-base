@@ -1,0 +1,39 @@
+---
+type: raw
+id: 6a2776bc000000003503a3a3
+title: "开市客采购后，Codex接管冰箱"
+description: "小红书 openclaw 收藏夹笔记原文:开市客采购后，Codex接管冰箱"
+resource: https://www.rednote.com/board/698ed28d0000000025034bea/6a2776bc000000003503a3a3?xsec_token=ABbotoOOBfemoFniuC0OmTNgys827n-5BTshZCBW6UaD8=&xsec_source=pc_board
+tags: [rednote, openclaw, REDSkill]
+timestamp: 2026-07-13T00:00:00Z
+---
+
+# 开市客采购后，Codex接管冰箱
+
+- **来源 board**: openclaw (https://www.rednote.com/board/698ed28d0000000025034bea)
+- **URL**: https://www.rednote.com/board/698ed28d0000000025034bea/6a2776bc000000003503a3a3?xsec_token=ABbotoOOBfemoFniuC0OmTNgys827n-5BTshZCBW6UaD8=&xsec_source=pc_board
+- **作者**: 克里斯缇爱土豆
+- **日期**: Edited at Jun 10
+- **标签**: #REDSkill
+
+## 正文
+
+记录一下Agent帮助我解决生活中的小细节。
+	
+每周家里都会到开市客采购，但也会面临一些小插曲。比如这次买的食材还没吃完，下次采购的时候，因为不记得之前买过什么，又重复买了一遍；早上站在冰箱门口，大脑一片空白，根本不知道今天要吃什么；家人偶尔想吃什么，以为冰箱里没有，就又在叮咚临时重复下单，导致食材重复或者浪费。
+	
+科技发展的尽头，是懒人终于懒出了生产力。
+	
+我先在 iPhone 的提醒事项里添加了一个「家庭御膳房」库存列表，分栏清单包括：食谱、库存、待采购，并把这个列表共享给家人。这样我们可以随时查看家里目前有什么食材，一目了然；想吃什么，也可以随时记录下来，下次统一采买。
+	
+但一想到要打字记录就头疼，所以我用 Codex 创建了一个 skill，用来识别超市小票采购清单，并添加至「家庭-库存」中。
+	
+使用了 3 周，也一次次打磨，目前感受非常良好：减少了采购次数和食材浪费，和家人之间的沟通成本也降低了。
+	
+同时，我现在还要求它记录优惠信息。未来可以看看，能不能让它总结优惠规律。因为我已经有三次都是刚刚买好，没过几天就打折了，实在是心有不甘啊。
+	
+也尝试过让 Codex 结合「库存」，按照家庭的需求制作一周清单。一周食谱的质量还可以，但我没有坚持下来，因为发现自己想吃的过于丰富和多变，它暂时理解不了我的口味，哈哈哈。还在进一步挖掘探索新的解决方案。#REDSkill
+
+## 图片(1)
+
+- https://sns-web-i10.rednotecdn.com/202607131513/f8dfda4aadac2bd3369336cbd0bec8f7/1040g0083216i6co9mu0040pp0usund7a4oppe38!nd_dft_wlteh_webp_3?src=A

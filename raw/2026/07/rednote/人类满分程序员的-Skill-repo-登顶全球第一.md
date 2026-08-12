@@ -1,0 +1,48 @@
+---
+type: raw
+id: 69f06fff000000003601c5ef
+title: "人类满分程序员的 Skill repo 登顶全球第一"
+description: "小红书 openclaw 收藏夹笔记原文:人类满分程序员的 Skill repo 登顶全球第一"
+resource: https://www.rednote.com/board/698ed28d0000000025034bea/69f06fff000000003601c5ef?xsec_token=ABOAV1YfI9jqMWRds2lWtZQvus5f87rVjUiNWFJ5wc3Bw=&xsec_source=pc_board
+tags: [rednote, openclaw]
+timestamp: 2026-07-13T00:00:00Z
+---
+
+# 人类满分程序员的 Skill repo 登顶全球第一
+
+- **来源 board**: openclaw (https://www.rednote.com/board/698ed28d0000000025034bea)
+- **URL**: https://www.rednote.com/board/698ed28d0000000025034bea/69f06fff000000003601c5ef?xsec_token=ABOAV1YfI9jqMWRds2lWtZQvus5f87rVjUiNWFJ5wc3Bw=&xsec_source=pc_board
+- **作者**: 趴在关键词上捡钱
+- **日期**: Edited at Apr 28
+
+## 正文
+
+我最喜欢的程序员（人类满分程序员）Matt Pocock 的 Skill 仓库登顶全球榜单啦✌️
+	
+最火的 Skill 是/grill me, 是一个只有 56 个单词的 Skill，用于替代 Claude Code 的 Plan Mode，可以产出更高质量的代码。
+	
+这个 Skill 的灵魂是 design tree，出自 Frederick P Books 的《The Design of Design》，他是一位计算机科学家教授。
+	
+Design tree就是把一个设计问题拆成一连串分支选择，沿着每条分支往下追，直到把方案想清楚。
+	
+任何人都可以用/grill me，推特上一个哥们用它为母亲写了悼词。我用它做客户咨询和提案，可以通过底部标签Matt Pocock 合集观看视频，双语视频，我精心翻译过。
+	
+---
+name: grill-me
+description: Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. Use when user wants to stress-test a plan, get grilled on their design, or mentions "grill me".
+---
+Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
+	
+Ask the questions one at a time.
+	
+If a question can be answered by exploring the codebase, explore the codebase instead.
+
+## 图片(7)
+
+- https://sns-web-i10.rednotecdn.com/202607131515/e580fff5e861d369b58a4121c80a5e98/notes_pre_post/1040g3k031vgf6pe02a305p97n43aml93a8flljo!nd_dft_wlteh_webp_3?src=A
+- https://sns-web-i10.rednotecdn.com/202607131515/fba2a7dae07998c21d6c58508d26999b/notes_pre_post/1040g3k031vgf6pe02a005p97n43aml93f9757qo!nd_dft_wlteh_webp_3?src=A
+- https://sns-web-i10.rednotecdn.com/202607131515/2ccc74a87f84c37fa45965b98982eec0/notes_pre_post/1040g3k031vgf6pe02a0g5p97n43aml93cq5kso8!nd_dft_wlteh_webp_3?src=A
+- https://sns-web-i10.rednotecdn.com/202607131515/d74845ad1e9a501b4e5188c0c9cf0f50/notes_pre_post/1040g3k031vgf6pe02a105p97n43aml93o7ou9sg!nd_dft_wlteh_webp_3?src=A
+- https://sns-web-i10.rednotecdn.com/202607131515/cbd6391a639481fba7266d838b1e9b43/notes_pre_post/1040g3k031vgf6pe02a1g5p97n43aml935gcrslg!nd_dft_wlteh_webp_3?src=A
+- https://sns-web-i10.rednotecdn.com/202607131515/118b32934d1a75fe9e20092dc2592870/notes_pre_post/1040g3k031vgf6pe02a205p97n43aml93rbujb8o!nd_dft_wlteh_webp_3?src=A
+- https://sns-web-i10.rednotecdn.com/202607131515/c70706efe207894cbfbc0d24c37ab41f/notes_pre_post/1040g3k031vgf6pe02a2g5p97n43aml93bkdl2lo!nd_dft_wlteh_webp_3?src=A
