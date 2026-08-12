@@ -4,7 +4,7 @@
 
 ## Base(全局配置源 ★指令层)
 
-- [base/](base/README.md) — 分发到 `~/.claude/` 的全局配置,对**所有 repo** 生效:`CLAUDE.md`(全局偏好)+ `commands/`(`/brain` `/idea` `/general-review`)。装法 `bash scripts/init.sh`(幂等,逐文件 symlink)。开发主力 skills 用 [mattpocock/skills](https://github.com/mattpocock/skills)(外部依赖,装在 `~/.agents/skills/`)
+- [base/](base/README.md) — 分发到 `~/.claude/` 与 `~/.codex/` 的全局配置,对**所有 repo** 生效:`CLAUDE.md` + `AGENTS.md`(全局偏好孪生文件,Claude / Codex 各一入口)+ `commands/`(`/brain` `/idea` `/general-review`)+ `agents/` 与 `codex-agents/`(六角色子代理定义)。装法 `bash scripts/init.sh`(幂等,逐文件 symlink)。开发主力 skills 用 [mattpocock/skills](https://github.com/mattpocock/skills)(外部依赖,装在 `~/.agents/skills/`)
 
 ## Preferences(偏好 ★指令层)
 
@@ -14,7 +14,7 @@
 ## Conventions(规范 ★指令层)
 
 **个人 conventions**(Owner 自己的开发,跨所有个人项目):
-- ~~[多模型编排规范](wiki/conventions/agent-orchestration.md)~~ — **已停用(2026-08-03)**。开发改以 mattpocock skills 为主,其 skill 自带子代理编排规则,两套叠加有歧义。配置原文归档于 [archive/subagents/](archive/README.md)
+- [多模型编排规范](wiki/conventions/agent-orchestration.md) — **已恢复并扩展(2026-08-12)**。六角色分层路由,Claude Code + Codex 双侧对等;三档语义映射 + 代际适配方法;Luna leaf-only 与不做 Sol 例行扇出两条硬边界。2026-08-03 的停用原因(与 mattpocock skills 编排叠加有歧义)已解:只分发 agent 定义、不加无条件引用
 
 **公司 conventions**(Amazon 内部环境专用,与个人 conventions 分开):
 - [Amazon 工作规范](wiki/conventions/amazon-workflow.md) — 生产安全铁律、Brazil/CRUX/Coral 等内部系统入口、包容性语言
