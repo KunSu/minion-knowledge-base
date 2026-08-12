@@ -22,11 +22,13 @@ timestamp: 2026-08-12T00:00:00Z
 | 角色 | Claude `model` | Claude `effort` | Codex `model` | Codex effort |
 |---|---|---|---|---|
 | 主会话(编排) | `opus`(Opus 5) | high | `openai.gpt-5.6-sol` | medium |
-| `deep-reasoner` | `opus` | xhigh | `openai.gpt-5.6-sol` | high |
+| `deep-reasoner` | `opus` | high | `openai.gpt-5.6-sol` | high |
 | `peer-review` | `sonnet` | high | `openai.gpt-5.6-terra` | high |
-| `fast-worker` | `sonnet` | low | `openai.gpt-5.6-terra` | low |
+| `fast-worker` | `sonnet` | low | *(继承 `[agents]` 默认)* | *(terra/low)* |
 | `verifier` | `sonnet` | high | `openai.gpt-5.6-terra` | high |
 | `Explore` / `scanner` | `haiku` | medium | `openai.gpt-5.6-luna` | medium |
+
+`fast-worker` 的 Codex 侧刻意不写 `model`/`effort`——它就是 `[agents]` 的默认档,写死会让代际升级要改每个文件。**只有偏离默认的角色才显式写。**
 
 Codex 侧 `Explore` 的对等角色叫 `scanner`(`Explore` 是 Claude 内置名,同名覆盖才有意义)。
 
@@ -62,25 +64,27 @@ Codex 侧 `Explore` 的对等角色叫 `scanner`(`Explore` 是 Claude 内置名,
 
 经验:**effort 不是线性延迟旋钮**。`xhigh`/`max` 常无质量增益只增延迟(实测 `luna/max` 比 `luna/high` 慢 54.3%、多用 61% 输入 token,质量零提升)。先调 effort 再换模型,但别默认拉满。
 
+**编排位若显式切到 Fable**(`/model fable`):安全扫描类任务直接固定到 Opus,绕开 Fable 的安全分类器,避免 refusal 重试延迟。默认编排位是 Opus 5 时用不上这条,但显式切换的能力一直保留,所以规则仍然有效。
+
 ## 1M 上下文
 
 - **Claude**:`[1m]` 后缀**按变量读、不按模型读**。Bedrock 上 `ANTHROPIC_DEFAULT_OPUS_MODEL` 不带后缀就是 200K,即使别处同模型带了后缀。另注意 Bedrock 上 `sonnet` 别名默认解析到 **Sonnet 4.5**(不是 5),须显式 pin。
-- **但 Sonnet 5 和 Fable 5 原生就是 1M,不需要也不接受 `[1m]` 后缀**(官方文档:"Sonnet 5 always runs with the 1M window on these providers and never needs the suffix")。给它们加后缀会产出白名单里不存在的 ID → 被 `availableModels` 拦掉 → **静默退回继承模型**。2026-08-12 实测踩过这个坑。
 - **Codex**:**没有 1M 开关**。窗口由模型本身决定;`model_context_window` 只声明 Codex 假设的窗口(影响何时压缩),不改变服务端真实窗口。
 
-## 两个静默失败陷阱(2026-08-12 实测确认)
+## 静默失败陷阱(2026-08-12 实测确认)
 
-这两个都**不报错**,只能靠读 transcript 里的真实 model 字段发现。子代理自报的模型身份**不可信**——它常报成继承来的模型。
+三个都**不报错**。共同的验证纪律:**读 transcript 里的真实 `message.model` 字段,别信子代理自报**——它常报成继承来的模型。
 
-**1. `availableModels` 白名单必须同时列裸别名和全 ID。** 配 `enforceAvailableModels: true` 时,白名单只列 `claude-haiku-4-5` 而不列 `haiku`,`model: haiku` 的子代理会被静默替换成继承模型(实测落到 `claude-opus-5`)。别名和它解析后的全 ID **两者都要在白名单里**。
-
-验证方法(不能靠自报):
 ```bash
 cd /tmp/probe && claude -p --agents '{"p":{"description":"probe","prompt":"Reply: OK","model":"haiku","tools":[]}}' "Dispatch p."
 # 然后读 ~/.claude/projects/<dir>/<session>/subagents/agent-*.jsonl 里的 message.model
 ```
 
-**2. Codex 的 Bedrock provider 必须显式指定 profile。** `[model_providers.amazon-bedrock.aws]` 只设 `region` 不设 `profile`,SDK 会退到 `~/.aws/credentials` 的 `[default]` 静态凭证;那份凭证过期后就是 401 `The security token included in the request is invalid`,而且 **`mwinit` 刷新救不了**——它走的不是 Midway→STS 那条链。正确配置指向带 `credential_process` 的 profile(本机是 `codex-DO-NOT-DELETE`)。
+**1. `availableModels` 白名单必须同时列裸别名和全 ID。** 配 `enforceAvailableModels: true` 时,白名单只列 `claude-haiku-4-5` 而不列 `haiku`,`model: haiku` 的子代理会被静默替换成继承模型(实测落到 `claude-opus-5`)。别名和它解析后的全 ID **两者都要在白名单里**。
+
+**2. 原生 1M 的模型不能加 `[1m]` 后缀。** Sonnet 5 和 Fable 5 原生就是 1M(官方文档:"Sonnet 5 always runs with the 1M window on these providers and never needs the suffix")。加了会产出白名单里不存在的 ID → 被拦掉 → 静默退回继承模型。**注意这与上一节 Opus 需要后缀的规则相反**,按模型分别处理。
+
+**3. Codex 的 Bedrock provider 必须显式指定 profile。** `[model_providers.amazon-bedrock.aws]` 只设 `region` 不设 `profile`,SDK 会退到 `~/.aws/credentials` 的 `[default]` 静态凭证;那份凭证过期后就是 401 `The security token included in the request is invalid`,而且 **`mwinit` 刷新救不了**——它走的不是 Midway→STS 那条链。正确配置指向带 `credential_process` 的 profile(本机是 `codex-DO-NOT-DELETE`)。
 
 所以 **401 有两条独立成因**,别只查 Midway:
 - Midway cookie 过期(~2 小时)→ `mwinit -o`
@@ -102,6 +106,7 @@ cd /tmp/probe && claude -p --agents '{"p":{"description":"probe","prompt":"Reply
 
 ## 并发与生命周期
 
+- **优先异步派发子代理,不要阻塞等待最慢的 worker。**
 - 只并行**独立读**或所有权互不重叠的工作。同文件/同记录的写必须串行,生产写入永不并行。
 - 用**单一指定写入者**;worker 和 verifier 通常只返回证据或建议 patch。
 - 完成的子代理及时关闭(实测已完成线程在显式关闭前仍占用线程配额)。

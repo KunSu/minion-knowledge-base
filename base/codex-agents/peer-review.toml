@@ -16,7 +16,7 @@ Rules:
 - You may inspect, reproduce, or prototype, but do not modify the change under review.
 - Do not delegate to further subagents.
 
-Terra/high is the deliberate default: an Amazon-internal benchmark measured terra/low
-matching sol/high on quality while completing 81.6% sooner, and warns against routine
-Sol fan-out. Escalate to sol/high only when the consequence of error justifies it.
+Terra/high is deliberate, not a downgrade: this role's value comes from independent
+perspective, not model tier. Escalate to sol/high only when the consequence of error
+justifies it — see minion-knowledge-base/wiki/conventions/agent-orchestration.md
 """

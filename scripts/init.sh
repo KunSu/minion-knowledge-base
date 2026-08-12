@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# init.sh — 把 minion-knowledge-base 的 base 配置分发到 ~/.claude,使其全局生效
+# init.sh — 把 minion-knowledge-base 的 base 配置分发到 ~/.claude 与 ~/.codex,使其全局生效
 #
 # 设计:
 #   - 逐文件 symlink(不是 cp)→ 改任一边都是改源,结构上不可能漂移
@@ -21,6 +21,7 @@ set -euo pipefail
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CLAUDE_DIR="$HOME/.claude"
 CODEX_DIR="${CODEX_HOME:-$HOME/.codex}"
+CODEX_DIR="${CODEX_DIR%/}"   # 去掉尾斜杠,否则下面的前缀匹配会失配
 BACKUP_DIR="$CLAUDE_DIR/backups/init-$(date +%Y%m%d-%H%M%S)"
 MP_SKILLS_DIR="$HOME/.agents/skills"
 
@@ -28,9 +29,12 @@ DRY_RUN=false
 [[ "${1:-}" == "--dry-run" ]] && DRY_RUN=true
 
 n_linked=0 n_skipped=0 n_backed_up=0
+N_STEPS=6 step=0
 
 say()  { printf '%s\n' "$*"; }
 run()  { if $DRY_RUN; then say "    [dry-run] $*"; else eval "$@"; fi; }
+# 步骤计数器:加/删一节只改 N_STEPS,不用逐处改 [N/6]
+next_step() { step=$((step + 1)); say "[$step/$N_STEPS] $*"; }
 
 # link_file <源(相对REPO_DIR)> <目标绝对路径>
 link_file() {
@@ -54,12 +58,16 @@ link_file() {
       say "  ↻ $name(重链:旧指向 $(readlink "$dest"))"
       run "rm -f '$dest'"
     else
-      # 备份路径按【目标】的相对结构命名(如 commands/brain.md),不用源路径。
-      # 两个目标根都要剥,否则 Codex 侧会退化成绝对路径拼接。
-      local rel="${dest#$CLAUDE_DIR/}"
-      rel="${rel#$CODEX_DIR/}"
-      rel="${rel#/}"
-      say "  ⚑ $name(备份原文件 → ${BACKUP_DIR#$HOME/}/$rel)"
+      # 备份路径 = <来源根>/<目标相对结构>,如 claude/commands/brain.md、codex/agents/x.toml。
+      # 必须带来源前缀:两个根下可能有同名文件(如 AGENTS.md),拍平会互相覆盖。
+      local rel root
+      case "$dest" in
+        "$CLAUDE_DIR"/*) root=claude; rel="${dest#"$CLAUDE_DIR"/}" ;;
+        "$CODEX_DIR"/*)  root=codex;  rel="${dest#"$CODEX_DIR"/}"  ;;
+        *)               root=other;  rel="$(basename "$dest")"    ;;
+      esac
+      rel="$root/$rel"
+      say "  ⚑ $name(备份原文件 → ${BACKUP_DIR#"$HOME"/}/$rel)"
       run "mkdir -p '$BACKUP_DIR/$(dirname "$rel")'"
       run "mv '$dest' '$BACKUP_DIR/$rel'"
       n_backed_up=$((n_backed_up + 1))
@@ -73,20 +81,21 @@ link_file() {
   n_linked=$((n_linked + 1))
 }
 
-say "==> minion-knowledge-base → ~/.claude"
+say "==> minion-knowledge-base → ~/.claude + ~/.codex"
 say "    源:  $REPO_DIR"
-say "    目标:$CLAUDE_DIR"
+say "    目标:$CLAUDE_DIR(Claude Code)"
+say "          $CODEX_DIR(Codex)"
 $DRY_RUN && say "    模式:DRY RUN(不会实际修改)"
 say
 
 # ---- 1. 全局偏好:孪生文件,各自入口 ----
-say "[1/6] 全局偏好(Claude CLAUDE.md + Codex AGENTS.md)"
+next_step "全局偏好(Claude CLAUDE.md + Codex AGENTS.md)"
 link_file "base/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
 link_file "base/AGENTS.md" "$CODEX_DIR/AGENTS.md"
 say
 
 # ---- 2. commands ----
-say "[2/6] 斜杠命令 commands/"
+next_step "斜杠命令 commands/"
 if [[ -d "$REPO_DIR/base/commands" ]]; then
   for f in "$REPO_DIR/base/commands"/*.md; do
     [[ -e "$f" ]] || continue
@@ -96,7 +105,7 @@ fi
 say
 
 # ---- 3. KB skills ----
-say "[3/6] KB skills(kb-* + awake)"
+next_step "KB skills(kb-* + awake)"
 if [[ -d "$REPO_DIR/skills" ]]; then
   for d in "$REPO_DIR/skills"/*/; do
     [[ -d "$d" ]] || continue
@@ -108,7 +117,7 @@ fi
 say
 
 # ---- 4. mattpocock skills:外部依赖,只检查不搬运 ----
-say "[4/6] mattpocock skills(外部依赖)"
+next_step "mattpocock skills(外部依赖)"
 if [[ -d "$MP_SKILLS_DIR" ]]; then
   count=$(find "$MP_SKILLS_DIR" -maxdepth 2 -name SKILL.md 2>/dev/null | wc -l | tr -d ' ')
   say "  ✓ 已安装($count 个,位于 ${MP_SKILLS_DIR#$HOME/})"
@@ -133,7 +142,7 @@ say
 # 只分发定义,不在 CLAUDE.md 里加无条件引用 —— subagent frontmatter 是声明式的,
 # 放着不改变编排行为,只在 description 匹配时才派发。这样与 mattpocock skills
 # 自带的编排规则(双轴并行、design-it-twice)不冲突:skill 有自己编排时走 skill 的。
-say "[5/6] 子代理定义 agents/(Claude)"
+next_step "子代理定义 agents/(Claude)"
 if [[ -d "$REPO_DIR/base/agents" ]]; then
   for f in "$REPO_DIR/base/agents"/*.md; do
     [[ -e "$f" ]] || continue
@@ -145,7 +154,7 @@ fi
 say
 
 # ---- 6. Codex 子代理定义 ----
-say "[6/6] 子代理定义 agents/(Codex)"
+next_step "子代理定义 agents/(Codex)"
 if [[ -d "$REPO_DIR/base/codex-agents" ]]; then
   for f in "$REPO_DIR/base/codex-agents"/*.toml; do
     [[ -e "$f" ]] || continue

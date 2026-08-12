@@ -20,7 +20,7 @@ Workflow:
    ```
    Codex runs on Bedrock, is a separate process, and does NOT see Claude's skills/CLAUDE.md — that isolation is the point: its view is genuinely independent. Read Codex's answer from the command output (it prints the final answer after a `tokens used` line).
 
-   Terra/high is the deliberate default here: an Amazon-internal benchmark measured `terra/low` matching `sol/high` on quality while completing 81.6% sooner, and warns against routine Sol fan-out. Escalate this call to `openai.gpt-5.6-sol` + `high` only when the consequence of error justifies it (see `wiki/conventions/agent-orchestration.md`).
+   Terra/high is deliberate, not a downgrade: this role's value comes from independent perspective, not model tier. Escalate to `openai.gpt-5.6-sol` + `high` only when the consequence of error justifies it — see `minion-knowledge-base/wiki/conventions/agent-orchestration.md`.
 3. If the `codex` command is missing or errors, you MUST explicitly declare "Codex unavailable: <reason>" in your output and return only your own analysis — never fabricate a Codex answer.
 4. Return a concise structured conclusion:
    - **Sonnet view**: 2-4 bullets (critique + alternative proposal if any)

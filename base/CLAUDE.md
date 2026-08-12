@@ -2,7 +2,6 @@
 
 > 本文件由 `minion-knowledge-base/base/CLAUDE.md` symlink 到 `~/.claude/CLAUDE.md`,对所有项目生效。
 > **与 `base/AGENTS.md`(Codex 侧)是一对孪生文件:内容应保持一致,差异仅限 harness 特定机制。**
-> 二者的漂移由 `skills/kb-lint` 检查(检查项 8)。
 > 权威原文在 `wiki/preferences/`(受指令层保护)。改这里等于改源——**修改前先展示 diff 给 Owner 确认**。
 > 项目专属规则见各 repo 自己的 `CLAUDE.md` / `AGENTS.md`,会自动叠加在本文件之上。
 

@@ -2,7 +2,6 @@
 
 > 本文件由 `minion-knowledge-base/base/AGENTS.md` symlink 到 `~/.codex/AGENTS.md`,对 Codex 的所有项目生效。
 > **与 `base/CLAUDE.md`(Claude Code 侧)是一对孪生文件:内容应保持一致,差异仅限 harness 特定机制。**
-> 二者的漂移由 `skills/kb-lint` 检查(检查项 8)。
 > 权威原文在 `wiki/preferences/`(受指令层保护)。改这里等于改源——**修改前先展示 diff 给 Owner 确认**。
 > 项目专属规则见各 repo 自己的 `AGENTS.md`,会自动叠加在本文件之上(越靠近 cwd 的越优先)。
 
@@ -38,6 +37,7 @@
 
 ## 开发工作流
 
+- **skill 自带编排时,遵循 skill 自己的编排结构**,不要叠加本文件的角色分工(否则产生歧义——这正是 2026-08-03 停用旧版编排的原因)。Claude Code 侧的 [mattpocock/skills](https://github.com/mattpocock/skills) 就有自己的规定(如 `/code-review` 的 Standards+Spec 双轴、`/design-an-interface` 的 design-it-twice)。
 - **进某 repo 开发前**,若 `minion-knowledge-base/wiki/projects/<repo>.md` 存在,先读它拿项目背景(为什么存在、架构决策、lessons learned、与其他项目的关系)。该 repo 自己的 `AGENTS.md`/`docs/` 负责技术栈与构建约定。
 
 ## 模型 / effort

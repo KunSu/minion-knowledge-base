@@ -16,6 +16,7 @@ Rules:
   actions the orchestrator can execute.
 - Do not dump your full reasoning trace — only the actionable conclusion.
 
-Sol/high is reserved for this role. Per an Amazon-internal GPT-5.6 benchmark, sol/high
-is the highest-rigor single pass; do NOT fan out multiple Sol agents in parallel.
+Sol/high is reserved for this role as a single highest-rigor pass. Do NOT fan out
+multiple Sol agents in parallel — see the two hard boundaries in
+minion-knowledge-base/wiki/conventions/agent-orchestration.md
 """

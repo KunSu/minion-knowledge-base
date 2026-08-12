@@ -18,7 +18,7 @@
 |---|---|
 | 想搞清 **KB 怎么用 / 结构 / 内容放哪层 / frontmatter 模板 / 完整铁律** | `README.md` |
 | **摄入/保存外部内容、查 KB、沉淀 lesson、体检 KB**(ingest / query / remember / lint),或 `@awake` | 对应 `skills/<name>/SKILL.md` 完整规程 |
-| **派子代理 / 并行分工 / 多模型编排**(deep-reasoner / peer-review / fast-worker / verifier / Fable 编排) | `wiki/conventions/agent-orchestration.md` |
+| **派子代理 / 并行分工 / 多模型编排 / 换模型档位**(deep-reasoner / peer-review / fast-worker / verifier / Explore·scanner / Claude+Codex 双侧路由) | `wiki/conventions/agent-orchestration.md` |
 | 需要 **Owner 的工程偏好 / 沟通风格 / 长期目标 / 某项目上下文** | 从 `index.md` 导航到对应 wiki 页 |
 | **Amazon 相关**:AWS / Brazil / CRUX / Coral / 内部系统 / 生产安全 | `wiki/conventions/amazon-workflow.md`(`scope: amazon`)|
 | **抓网页 / 爬虫 / 解析 HTML / 反爬限流 / 连已登录浏览器 / 小红书 rednote** | `wiki/knowledge/scrape-logged-in-chrome.md` |
