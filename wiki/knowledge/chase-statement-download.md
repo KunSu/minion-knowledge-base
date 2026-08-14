@@ -116,4 +116,5 @@ for (const [yr, F] of [['2026','CURRENT_YEAR'],['2025','CURRENT_YEAR_MINUS_1']])
 
 ## 相关
 
+- [批量下载 Bank of America 对账单 PDF](boa-statement-download.md) —— 同类任务但机制不同(两步链路、无 docKey)。**去 BoA 前务必先读它的「四个陷阱」**:Chrome 每次执行只放行 1 个下载(Chase 能连下 167 个是因为该域已被授予权限,别以为通用)、服务端认年份上下文、面板名按账户类型变化、脚本自报成功≠文件落地。
 - 别把中途产生的重复/错名文件留在 `~/Downloads`:blob 下载重名会被 Chrome 加 ` (1)` 后缀,清理前先确认哪些是本次产生的(按时间戳),不要误删 Owner 原有文件。
