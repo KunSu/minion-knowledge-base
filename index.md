@@ -25,7 +25,7 @@ _暂无_
 
 ## Knowledge(通用知识)
 
-_暂无_
+- [批量下载 Chase 对账单 PDF](wiki/knowledge/chase-statement-download.md) — chrome-devtools MCP 复用已登录 Chrome 会话;三步链路 `docref/list → dockey/list → pdfdoc`(`documentId` ≠ `docKey`,直接用会得到伪装成 504 的 `Invalid DocLocator`);UI 原生下载是整页导航故连点会互相取消,改 fetch+blob;含年份枚举、账户内部 ID 表、对账收尾
 
 ## Skills(操作规程)
 

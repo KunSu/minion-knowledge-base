@@ -42,3 +42,4 @@
 2026-07-12 | edit | wiki/conventions/amazon-workflow.md | scope: company → amazon;顶部注明仅干 Amazon 活时才 load
 2026-07-12 | edit | .gitignore | 忽略 .obsidian/(本机 Obsidian 配置,不跨机共享)
 2026-07-12 | edit | skills/awake/SKILL.md | 多机说明:脚本随 KB 走,以本 skill 目录下 keep_awake.sh 为准
+2026-08-14 | remember | wiki/knowledge/chase-statement-download.md, index.md | 批量下载 Chase 对账单 PDF 的方法(首个 knowledge 页)。实测 3 账户 × 2022–2026 共 167 份零失败。核心坑:①列表返回的 documentId 不是下载用的 docKey,中间要过一次 dockey/list 换一次性 locator,直接用会得到 HTTP 504 + Invalid DocLocator——且 ~160ms 就返回,是伪装成网关超时的业务错误,不读 body 会误判为限流;②页面原生下载是隐藏 form + target=_self 整页导航,连点多行互相取消(点 7 行只落地 1 份),改走 fetch→blob→a[download] 后稳定串行;③换 docKey 是异步的,靠固定 sleep 拦表单会漏(160ms 只抓到 4/7)。另记:chrome-devtools MCP 连的是本机真实 Chrome、可复用已登录会话(我起初未验证就答「不能访问」是错的),但页面状态会被 Owner 中途改动,每步需先确认;年份枚举 CURRENT_YEAR_MINUS_N;收尾必须用官方清单 diff 本地文件而非按数量猜(当年年份天然不满 12)
