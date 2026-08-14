@@ -9,3 +9,12 @@ Thumbs.db
 
 # Obsidian 本机配置(窗口布局/最近打开等易变项,不跨机共享)
 .obsidian/
+
+# 本机工具文档 —— 含 Amazon 内部主机名与路径,而本 repo 是 public,永不入库。
+# 放在 repo 目录里只为两件事: 让 AI 在本 repo 工作时能发现 cdd(Grep/Glob 找得到),
+# 以及 Owner 能直接双击打开 README.html。
+# 权威实现在 ~/.local/bin/cdd(同样不入库);主机名隔离在 ~/.ssh/config 的 Host cdd。
+tools/cdd/
+
+# ripgrep 专用配置(让 tools/cdd 可被 AI 搜索发现),同样只在本机生效。
+.ignore
