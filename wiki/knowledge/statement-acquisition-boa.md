@@ -8,7 +8,7 @@ timestamp: 2026-08-14T09:30:00Z
 
 # 批量下载 Bank of America 对账单 PDF
 
-2026-08-14 实测跑通:4 个 BoA 账户共 104 份(存款 27、信用卡 26、房贷 51)。与 [Chase 那套](chase-statement-download.md) 机制完全不同,坑更多。
+2026-08-14 实测跑通:4 个 BoA 账户共 104 份(存款 27、信用卡 26、房贷 51)。与 [Chase 那套](statement-acquisition-chase.md) 机制完全不同,坑更多。
 
 前提同 Chase:`chrome-devtools` MCP 连本机真实 Chrome,复用已登录会话。
 
@@ -233,10 +233,10 @@ rm boa_statements.zip
 
 比数量更可靠的检查是**在每个账户自己的首末区间内逐月走一遍,找断月**。当年年份天然不满 12,而账户开户月之前本就没有 —— **只有区间内的空洞才是真缺失**。
 
-有会话时再用页面的年份清单复核一遍(与 [Chase 页](chase-statement-download.md)「收尾」一节同构:官方清单是更强的真相来源,月份连续性是不需要会话的廉价检查)。
+有会话时再用页面的年份清单复核一遍(与 [Chase 页](statement-acquisition-chase.md)「收尾」一节同构:官方清单是更强的真相来源,月份连续性是不需要会话的廉价检查)。
 
 同时校验有效性:文件头 `%PDF-` + 体积下限(失败常是几十 KB 的 HTML 错误页,不是 0 字节)。
 
 ## 相关
 
-- [批量下载 Chase 对账单 PDF](chase-statement-download.md) —— Chase 是三步链路(`documentId` 要换一次性 `docKey`)、UI 用整页导航下载,与 BoA 的坑不同
+- [批量下载 Chase 对账单 PDF](statement-acquisition-chase.md) —— Chase 是三步链路(`documentId` 要换一次性 `docKey`)、UI 用整页导航下载,与 BoA 的坑不同

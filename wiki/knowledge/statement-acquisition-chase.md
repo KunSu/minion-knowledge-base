@@ -62,7 +62,7 @@ timestamp: 2026-08-14T09:30:00Z
 
 正确做法是绕开它:自己走三步链路 → `fetch` 拿 blob → 造 `<a download=文件名>` 点击。blob 下载**不触发导航**,可以稳定串行,167 份零失败。
 
-> **注意 Chrome 的下载权限**:本页这套 blob 连续下载在 Chase 域跑通了 167 份,但**未授予「自动多文件下载」权限的域每次脚本执行只放行 1 个下载**(在 BoA 域实测如此)。Chase 域此前被授权过是**推断**,没有查证 `chrome://settings/content/automaticDownloads`。换机器或换域先小批量试跑并核对落地数,别假设能连下。解法见 [BoA 页](boa-statement-download.md)的 ZIP 打包法。
+> **注意 Chrome 的下载权限**:本页这套 blob 连续下载在 Chase 域跑通了 167 份,但**未授予「自动多文件下载」权限的域每次脚本执行只放行 1 个下载**(在 BoA 域实测如此)。Chase 域此前被授权过是**推断**,没有查证 `chrome://settings/content/automaticDownloads`。换机器或换域先小批量试跑并核对落地数,别假设能连下。解法见 [BoA 页](statement-acquisition-boa.md)的 ZIP 打包法。
 
 ## 可复用脚本骨架
 
@@ -135,4 +135,4 @@ blob 下载遇到重名会被 Chrome 自动加 ` (1)` 后缀。清理前先按�
 
 ## 相关
 
-- [批量下载 Bank of America 对账单 PDF](boa-statement-download.md) —— 同类任务但机制不同(两步链路、无 docKey)。**去 BoA 前务必先读它的「四个陷阱」**:Chrome 未授权域每次执行只放行 1 个下载、服务端认年份上下文、折叠面板名按账户类型变化、脚本自报成功≠文件落地。
+- [批量下载 Bank of America 对账单 PDF](statement-acquisition-boa.md) —— 同类任务但机制不同(两步链路、无 docKey)。**去 BoA 前务必先读它的「四个陷阱」**:Chrome 未授权域每次执行只放行 1 个下载、服务端认年份上下文、折叠面板名按账户类型变化、脚本自报成功≠文件落地。

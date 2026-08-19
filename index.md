@@ -21,12 +21,12 @@ _暂无_
 
 ## Projects(项目上下文)
 
-_暂无_
+- [little-minion(Financial)](wiki/projects/little-minion.md) — 个人财务 app,以对账单 PDF 归档为输入;归档形态、一份文档覆盖两账户的坑、跨会话教训、不得落盘账号的硬约束
 
 ## Knowledge(通用知识)
 
-- [批量下载 Chase 对账单 PDF](wiki/knowledge/chase-statement-download.md) — 三步链路,`documentId` ≠ `docKey`
-- [批量下载 Bank of America 对账单 PDF](wiki/knowledge/boa-statement-download.md) — 两步链路,四个陷阱(下载限流 / 年份上下文 / 面板名 / 计数器不可信)
+- [批量下载 Chase 对账单 PDF](wiki/knowledge/statement-acquisition-chase.md) — 三步链路,`documentId` ≠ `docKey`
+- [批量下载 Bank of America 对账单 PDF](wiki/knowledge/statement-acquisition-boa.md) — 两步链路,四个陷阱(下载限流 / 年份上下文 / 面板名 / 计数器不可信)
 
 ## Skills(操作规程)
 
