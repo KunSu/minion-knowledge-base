@@ -25,8 +25,8 @@ _暂无_
 
 ## Knowledge(通用知识)
 
-- [批量下载 Chase 对账单 PDF](wiki/knowledge/chase-statement-download.md) — chrome-devtools MCP 复用已登录 Chrome 会话;三步链路 `docref/list → dockey/list → pdfdoc`(`documentId` ≠ `docKey`,直接用会得到伪装成 504 的 `Invalid DocLocator`);UI 原生下载是整页导航故连点会互相取消,改 fetch+blob;含年份枚举、账户内部 ID 表、对账收尾
-- [批量下载 Bank of America 对账单 PDF](wiki/knowledge/boa-statement-download.md) — 两步链路(`data-docid` → `docViewDownload`);四个陷阱:Chrome 未授权域**每次脚本执行只放行 1 个下载**(解法是页内打包 store-only ZIP 只下 1 次;不可落盘 cookie 用 curl 绕)、服务端认年份上下文(不切年份就返回 76100 字节 HTML)、折叠面板名按账户类型变化(房贷是 `Statements and Escrow Analysis`,精确匹配会把自己的 bug 误报成数据缺失)、脚本自报成功≠文件落地;含 adx 获取、各账户在线可用范围、owner 不可从对账单姓名栏推断
+- [批量下载 Chase 对账单 PDF](wiki/knowledge/chase-statement-download.md) — 三步链路,`documentId` ≠ `docKey`
+- [批量下载 Bank of America 对账单 PDF](wiki/knowledge/boa-statement-download.md) — 两步链路,四个陷阱(下载限流 / 年份上下文 / 面板名 / 计数器不可信)
 
 ## Skills(操作规程)
 
