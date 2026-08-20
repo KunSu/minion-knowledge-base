@@ -5,7 +5,7 @@ description: Owner 的 subagent 分工与工作流链,Claude Code + Codex 双侧
 scope: personal
 resource: https://www.developersdigest.tech/blog/fable-5-orchestrator-model-playbook
 tags: [claude, codex, subagents, orchestration, model-routing]
-timestamp: 2026-08-12T00:00:00Z
+timestamp: 2026-08-19T00:00:00Z
 ---
 
 # 多模型编排规范
@@ -39,7 +39,7 @@ Codex 侧 `Explore` 的对等角色叫 `scanner`(`Explore` 是 Claude 内置名,
 ## 两条硬边界
 
 1. **Luna 只做叶子(leaf-only)**。用 `luna` 的角色**不得** spawn / steer / message / wait / consolidate 其他 agent,所有跨 agent 通信走 Terra 或 Sol 父节点。这是**能力边界**,不是风格偏好——Luna 不暴露编排所需能力,也不得改 model catalog 去伪造。编排位必须 Terra 或 Sol。
-2. **不在 Sol 上做例行并行扇出**。并行会放大延迟、token 和挂起线程的影响。Sol 只用作**单次定向挑战者**,在后果严重时。benchmark 实测:`terra/low` 质量打平 `sol/high`(均 100/100)但快 81.6%(5.42x),且完成时间 CV 仅 2.52%——并行可预测性最好。
+2. **不在最高档模型上做例行并行扇出**——Codex 侧 `sol`,Claude 侧 `opus`,**两侧同等适用**。并行会放大延迟、token 和挂起线程的影响。这一档只用作**单次定向挑战者**,在后果严重时;两侧的 `deep-reasoner` 都受此约束,不要同时派多个。benchmark 实测(数据取自 Codex 侧):`terra/low` 质量打平 `sol/high`(均 100/100)但快 81.6%(5.42x),且完成时间 CV 仅 2.52%——并行可预测性最好。
 
 升级路径:`terra/low → terra/high → sol/high`(routine → demanding → critical)。因**实质不确定性、风险、或验证失败**才升级,不因任务长就升级。升级是**交接不是重启**:把已有结论、证据、失败的检查、未决问题交给更强的模型,不要从头再查。
 
@@ -110,7 +110,7 @@ cd /tmp/probe && claude -p --agents '{"p":{"description":"probe","prompt":"Reply
 - 定义文件在 `base/agents/`(Claude)与 `base/codex-agents/`(Codex),由 `scripts/init.sh` symlink 到 `~/.claude/agents/` 和 `~/.codex/agents/`。项目级同名覆盖全局。
 - **只分发定义,不加无条件引用**。subagent 定义是声明式的:放着不改变编排行为,只在 `description` 匹配时才派发。这样与 mattpocock skills 自带的编排规则(`/code-review` 双轴、`/design-an-interface` design-it-twice)不冲突——skill 有自己编排时走 skill 的,没有时才落到这六个角色。(2026-08-03 停用旧版就是因为 `@SUBAGENTS.md` 无条件全局加载产生歧义,见 `archive/README.md`。)
 - **只读角色靠机制约束,不靠 prompt 措辞。** 覆盖内置 `Explore` 时若不写 `tools`,会把内置的只读约束一并解掉,静默拿到写权限。
-- **但两侧只读强度不等价**:Codex 的 `sandbox_mode = "read-only"` 是运行时强制;Claude 的 `tools` 白名单只是不给写工具,**白名单里一旦有 `Bash`,只读就是空话**(可 `sh -c "echo > f"`)。所以 `Explore` 的白名单刻意不含 `Bash`——`Read`/`Glob`/`Grep` 足够定位代码。
+- **但两侧只读强度不等价**:Codex 的 `sandbox_mode = "read-only"` 是运行时强制;Claude 的 `tools` 白名单只是不给写工具,**白名单里一旦有 `Bash`,只读就是空话**(可 `sh -c "echo > f"`)。所以 `Explore` 的白名单刻意**不含 `Bash`**,其余沿用内置 Explore 的只读工具集:`Read`/`Glob`/`Grep`/`WebFetch`/`WebSearch`/`TodoWrite`(六个,定位代码够用且都不写本地文件)。
 - 其余四个角色(`deep-reasoner`/`fast-worker`/`verifier`/`peer-review`)**不限制写权限**,靠 prompt 约束行为:
   - `verifier` 要跑 build/test,那些必须写文件——用只读沙箱会把 build 一起挡掉,所以两侧都不设。它的约束是「不改被审查的变更」。
   - `peer-review` 要能起原型验证替代方案,同理。
@@ -148,16 +148,8 @@ cd /tmp/probe && claude -p --agents '{"p":{"description":"probe","prompt":"Reply
 - **不要在会话中途换模型**——会失效 prompt cache,下一轮约 5× 成本。只在 task / subagent / session 边界路由。
 - 不索取隐藏思维链;要可检查的决策、假设、证据、验证。别让子代理「完整展示推理过程」(会触发 reasoning_extraction 分类器)。
 
-## Amazon 环境提示
+## Amazon 环境下的编排(Midway / 429 / prompt cache)
 
-`codex exec` 或 Claude Code 报 401 / 403 / "security token expired" / "Could not load credentials" 通常是 **Midway 过期**,不是 OAuth 问题——`/login` 在 3P provider 模式下不可用,跑 `mwinit -o` 重试。Midway cookie 有效期约 2 小时。**`mwinit` 刷了还报 401 就是凭证链走错 profile**(见上「静默失败陷阱」#3)。
+本页是 `scope: personal`,任何派子代理的任务都会读它,所以 Amazon 专属的运维细节不放这里——**见 [Amazon 工作规范](amazon-workflow.md)「Bedrock 上的编排环境」**(`scope: amazon`,只在干 Amazon 活时加载):Midway 过期导致的 401、429 的 RPM/TPM 双桶与时段反相关、prompt cache 5 分钟 TTL 的成本阶跃。
 
-429 在 Bedrock 上分两种,对应**两个独立令牌桶**(按 `账号 × region × 模型` 维护,独立检查):`Too many requests`(RPM,与请求大小无关)和 `Too many tokens`(TPM)。**实测近 8 天 12 次真实 429 里 11 次是 RPM**——所以请求大小不是主因,`[1m]` 也不是触发器。
-
-配额按模型分池,这带来两条可操作的结论:
-- **`fallbackModel` 首位放另一个模型族**(如 Sonnet 5),限流时才能降级到**未被争用的桶**;放另一个 Opus 等于换到同族的拥挤桶。
-- 把 Explore / 机械任务下沉到 haiku/luna 不只省钱,也是把负载分到不同配额池。
-
-**实测发现 429 与自身负载反相关**:12 次全部落在 09:47–15:11 PDT,而该时段吞吐比零事故的深夜时段**轻 7–10 倍**,6/12 次发生在「前 60 秒一个请求都没发」时。强推断是共享配额在太平洋工作时段被其他租户争用(账号是否多租户共享未直接核验)。**最强杠杆是把重活挪出 09:00–15:00 PDT**,配置只能做优雅降级。
-
-**prompt cache 的真实成本来自 5 分钟 TTL 到期**:Claude Code 只用 5 分钟档(`ephemeral_1h = 0`)。按距同 session 上一请求的间隔分组,5 分钟处是干净阶跃——间隔 >5min 的请求平均 cache_creation 从 4k 跳到 187k(>30min 则 352k)。**3% 的请求制造了约 30% 的缓存写入量**:多 session 轮转时每个 session 空转超 5 分钟就 TTL 到期,下一轮按 1.25× 重写整个约 35 万 token 前缀。
+上面「模型分池」相关的两条编排结论仍适用于本页范围内的路由决策:`fallbackModel` 首位放**另一个模型族**才能降级到未被争用的配额桶;把 Explore / 机械任务下沉到 haiku/luna 也是把负载分到不同池。

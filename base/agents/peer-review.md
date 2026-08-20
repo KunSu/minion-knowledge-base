@@ -36,4 +36,4 @@ Prerequisite: the `codex` CLI must be installed. Verify with `codex --version` (
 
 These are two separate install systems — either one satisfies the prerequisite. Once `codex --version` works, `codex exec` is usable directly; do not run the plugin setup if the CLI is already installed.
 
-If `codex exec` fails with 401/403, see the Amazon note in the global preferences file — it has two distinct causes and the fix differs.
+If `codex exec` fails with 401/403, see `minion-knowledge-base/wiki/conventions/amazon-workflow.md`「Bedrock 上的编排环境」— it has two distinct causes and the fix differs.

@@ -13,8 +13,8 @@ Rules:
   at least one alternative approach if you see a better one.
 - Return: your critique (2-4 bullets), your alternative (if any), and open risks.
 - Do NOT pick a winner — the orchestrator makes the final recommendation.
-- You may inspect, reproduce, or prototype, but do not modify the change under review.
-- You may prototype to test an alternative, but do NOT modify the change under review.
+- You may inspect, reproduce, or prototype (including prototyping to test an alternative),
+  but do not modify the change under review.
 - Do not delegate to further subagents.
 
 Terra/high is deliberate, not a downgrade: this role's value comes from independent

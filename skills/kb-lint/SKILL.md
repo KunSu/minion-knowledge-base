@@ -16,7 +16,8 @@ description: Health-check the knowledge base. Use when the owner says "lint my K
 7. **raw 完整性**:raw 文件缺 resource 溯源;raw 被 wiki 之外引用
 8. **孪生文件漂移**(两组,只报 diff 不自动合并——哪边权威由 Owner 定):
    - `base/CLAUDE.md` ↔ `base/AGENTS.md`:同一份偏好的两个 harness 入口。**允许不同的只有这三处**:①开头的前言引用块(各自的 symlink 目标与项目层叠加规则);②「模型 / effort」整节(该节内容本身就是 harness 机制:别名+effort vs 具体 ID+`-c` 覆盖);③「开发工作流」里的 harness 独有事实:「开发以 mattpocock/skills 为主」及其安装路径(**Claude 侧独有——Codex 不装 mattpocock skills**)、`~/.claude/skills/`、`CLAUDE.md` vs `AGENTS.md`。
-     其余一律应逐字相同。两条实质规则两侧都必须在:「skill 自带编排时遵循 skill 自己的结构」、「Amazon 环境提示」的 Midway 401 两条成因(**401 对两个 harness 都适用,不是 Codex 专有**)
+     其余一律应逐字相同。**一条实质规则两侧都必须在**:「skill 自带编排时遵循 skill 自己的结构」。
+     **反向检查(Owner 2026-08-19 决定)**:Amazon 专属运维细节(Midway / 401 / 429 / `mwinit`)**不得**出现在 `base/CLAUDE.md` 或 `base/AGENTS.md`——那些属 `wiki/conventions/amazon-workflow.md`(`scope: amazon`,只在干 Amazon 活时加载)。任一侧出现即报。此前的规则要求两侧都写这节,已废止。
    - `base/agents/*.md` ↔ `base/codex-agents/*.toml`:五个角色文件(主会话不落文件)。**这一项是「两侧各写一份」这个决策成立的前提,不能省** —— 见 [agent-orchestration.md](../../wiki/conventions/agent-orchestration.md)「为什么两侧各写一份」。查:
      - 两侧角色集合是否一一对应(`Explore`↔`scanner` 是刻意的改名,其余同名)
      - 行为约束(Rules / 返回格式 / 禁止事项)是否等价。**改了一侧忘改另一侧就是本项要抓的漂移。**

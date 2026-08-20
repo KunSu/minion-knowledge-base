@@ -44,9 +44,3 @@
 
 - 默认:主会话 `openai.gpt-5.6-sol` + `medium`(在 `~/.codex/config.toml` 固定)。
 - 子代理定义在 `~/.codex/agents/*.toml`。**显式指定模型/effort、角色→模型映射、升级路径、代际适配、硬边界,全部见 `wiki/conventions/agent-orchestration.md`——派子代理或换档位前读它。**
-
-## Amazon 环境提示
-
-- 报 401 / 403 / "security token expired" / "Could not load credentials" 通常是 **Midway 过期**,不是 OAuth 问题(`/login` 在 3P provider 模式下不可用)——跑 `mwinit -o` 重试。Midway cookie 有效期约 2 小时。
-- **`mwinit` 刷了还报 401**:那是凭证链走错 profile,另一条成因。见 `wiki/conventions/agent-orchestration.md`「静默失败陷阱」。
-- **反复 429**:Bedrock 有 RPM 和 TPM 两个独立桶,实测 11/12 次撞的是 RPM(与请求大小无关)。429 与自身负载**反相关**——集中在 09:00–15:00 PDT 的共享配额争用期。最强杠杆是把重活挪到深夜;配置层只能靠 `fallbackModel` 首位放**另一个模型族**做优雅降级。细节见 `wiki/conventions/agent-orchestration.md`「Amazon 环境提示」。
