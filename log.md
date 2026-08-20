@@ -42,3 +42,6 @@
 2026-07-12 | edit | wiki/conventions/amazon-workflow.md | scope: company → amazon;顶部注明仅干 Amazon 活时才 load
 2026-07-12 | edit | .gitignore | 忽略 .obsidian/(本机 Obsidian 配置,不跨机共享)
 2026-07-12 | edit | skills/awake/SKILL.md | 多机说明:脚本随 KB 走,以本 skill 目录下 keep_awake.sh 为准
+2026-08-14 | remember | wiki/knowledge/chase-statement-download.md, index.md | Chase 对账单批量下载流程(首个 knowledge 页)。三步链路,核心坑是 documentId ≠ docKey。详见页面
+2026-08-14 | remember | wiki/knowledge/boa-statement-download.md, wiki/knowledge/chase-statement-download.md, index.md | BoA 对账单批量下载流程 + Chase 页加交叉链接。两步链路,四个陷阱。详见页面
+2026-08-19 | edit | wiki/knowledge/statement-acquisition-{chase,boa}.md, wiki/projects/little-minion.md, index.md | 两个获取流程页改名为 statement-acquisition-*(与 issue #49 的 acquisition 用词及既有 Merrill 页对齐,预留每机构一页的家);新建 little-minion project 页承载项目上下文并指向它们。决策:procedure 留在 knowledge/ 而非放 projects/ 子目录——README 规定 projects 每个 repo 一页,而 procedure 是面向机构的机制、已是 3 家且会继续长,属集合
