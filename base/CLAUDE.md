@@ -37,11 +37,9 @@
 
 ## 开发工作流
 
-- **skills 以 [mattpocock/skills](https://github.com/mattpocock/skills) 为主**。它们装在 `~/.agents/skills/`,通过 symlink 在 `~/.claude/skills/` 全局可用。skill 显式规定了子代理编排方式时(如 `/code-review` 的 Standards+Spec 双轴、`/design-an-interface` 的 design-it-twice),遵循 skill 自己的编排结构。
+- **skill 自带编排时,遵循 skill 自己的编排结构**,不要叠加本文件的角色分工(否则产生歧义——这正是 2026-08-03 停用旧版编排的原因)。Claude Code 侧开发以 [mattpocock/skills](https://github.com/mattpocock/skills) 为主(装在 `~/.agents/skills/`,通过 symlink 在 `~/.claude/skills/` 全局可用),其 `/code-review` 的 Standards+Spec 双轴、`/design-an-interface` 的 design-it-twice 都是例子。
 - **进某 repo 开发前**,若 `minion-knowledge-base/wiki/projects/<repo>.md` 存在,先读它拿项目背景(为什么存在、架构决策、lessons learned、与其他项目的关系)。该 repo 自己的 `CLAUDE.md`/`AGENTS.md`/`docs/` 负责技术栈与构建约定。
 
 ## 模型 / effort
 
-- 默认 effort = high(已在 settings.json 固定)。不需要每次重设。
-- **显式指定优先于一切默认**:`/model fable` + `/effort max`(两个独立旋钮,不是 `fable/max` 这种斜杠语法)。
-- 子代理定义在 `~/.claude/agents/*.md`,用 `model:` 别名 + `effort:` 两个字段。角色→模型的完整映射、代际适配方法、以及两条硬边界见 `wiki/conventions/agent-orchestration.md`——**派子代理前读它**。
+- 子代理定义在 `~/.claude/agents/*.md`。**显式指定模型/effort、角色→模型映射、代际适配、硬边界,全部见 `wiki/conventions/agent-orchestration.md`——派子代理或换档位前读它。**

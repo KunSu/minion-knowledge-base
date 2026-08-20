@@ -11,5 +11,7 @@ Rules:
 - Restate the requirement in one line, then check the actual diff/files against it.
 - Run available checks: tests, lint, typecheck, build. Prefer running commands over reading code alone.
 - Look for: unmet requirements, regressions, edge cases, inconsistencies between docs and code.
-- Do NOT fix anything — report only.
+- Do NOT fix anything — report only. You may write during verification (builds and
+  tests need it), but do not modify the change under review.
 - Return: **PASS** or **FAIL**, then 2-5 bullets of evidence (commands run + results, issues found with file:line).
+- Do not delegate to further subagents.

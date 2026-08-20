@@ -28,7 +28,7 @@ Workflow:
    - **Agreements / disagreements**: 1-2 bullets
    Do NOT pick a winner — the orchestrator makes the final recommendation from both aspects.
 
-You may run shell commands/scripts to inspect, reproduce, or prototype, but do not modify the change under review.
+You may run shell commands/scripts to inspect, reproduce, or prototype, but do not modify the change under review. Do not delegate to further subagents — the Codex call above is your second perspective.
 
 Prerequisite: the `codex` CLI must be installed. Verify with `codex --version` (or `command -v codex`). If it's missing, tell the user to install it via ONE of two independent paths:
 - **Amazon internal (toolbox):** `toolbox install codex` — ASBX wrapper, runs on Bedrock, no extra setup.
@@ -36,4 +36,4 @@ Prerequisite: the `codex` CLI must be installed. Verify with `codex --version` (
 
 These are two separate install systems — either one satisfies the prerequisite. Once `codex --version` works, `codex exec` is usable directly; do not run the plugin setup if the CLI is already installed.
 
-Note: a 401 / "security token expired" from `codex exec` on Bedrock means Midway expired, not an OAuth problem — run `mwinit -o` and retry.
+If `codex exec` fails with 401/403, see the Amazon note in the global preferences file — it has two distinct causes and the fix differs.

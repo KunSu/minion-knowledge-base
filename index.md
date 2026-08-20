@@ -4,7 +4,7 @@
 
 ## Base(全局配置源 ★指令层)
 
-- [base/](base/README.md) — 分发到 `~/.claude/` 与 `~/.codex/` 的全局配置,对**所有 repo** 生效:`CLAUDE.md` + `AGENTS.md`(全局偏好孪生文件,Claude / Codex 各一入口)+ `commands/`(`/brain` `/idea` `/general-review`)+ `agents/` 与 `codex-agents/`(六角色子代理定义)。装法 `bash scripts/init.sh`(幂等,逐文件 symlink)。开发主力 skills 用 [mattpocock/skills](https://github.com/mattpocock/skills)(外部依赖,装在 `~/.agents/skills/`)
+- [base/](base/README.md) — 分发到 `~/.claude/` 与 `~/.codex/` 的全局配置,对**所有 repo** 生效:`CLAUDE.md` + `AGENTS.md`(全局偏好孪生文件,Claude / Codex 各一入口)+ `commands/`(`/brain` `/idea` `/general-review`)+ `agents/` 与 `codex-agents/`(子代理定义各 5 个,主会话不落文件)。装法 `bash scripts/init.sh`(幂等,逐文件 symlink)。开发主力 skills 用 [mattpocock/skills](https://github.com/mattpocock/skills)(外部依赖,装在 `~/.agents/skills/`)
 
 ## Preferences(偏好 ★指令层)
 

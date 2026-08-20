@@ -18,7 +18,21 @@
 
 set -euo pipefail
 
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# BASH_SOURCE 兜空 + repo 断言:管道执行时它未定义(set -u 会杀脚本),
+# 经 symlink 调用时 dirname 又算不出真实 repo 根。两种情况都显式报错退出,
+# 而不是算出 REPO_DIR=/ 然后静默「跳过所有文件」。
+SELF="${BASH_SOURCE[0]:-}"
+if [[ -z "$SELF" ]]; then
+  printf '%s\n' "✗ 请以文件方式执行(bash scripts/init.sh),不要管道执行——管道下无法定位 repo 根" >&2
+  exit 1
+fi
+REPO_DIR="$(cd "$(dirname "$SELF")/.." && pwd)"
+# 断言 repo 真在那儿:dirname 不穿透 symlink,经 symlink 调用时上面会算出错误的 REPO_DIR,
+# 那会让每个 link 都静默报「源不存在」并以 0 退出——比直接失败更危险。
+if [[ ! -f "$REPO_DIR/base/CLAUDE.md" ]]; then
+  printf '%s\n' "✗ 未能定位 repo 根(算出 $REPO_DIR)。请直接执行仓库内的真实路径,不要经 symlink 调用" >&2
+  exit 1
+fi
 CLAUDE_DIR="$HOME/.claude"
 CODEX_DIR="${CODEX_HOME:-$HOME/.codex}"
 CODEX_DIR="${CODEX_DIR%/}"   # 去掉尾斜杠,否则下面的前缀匹配会失配
@@ -26,15 +40,25 @@ BACKUP_DIR="$CLAUDE_DIR/backups/init-$(date +%Y%m%d-%H%M%S)"
 MP_SKILLS_DIR="$HOME/.agents/skills"
 
 DRY_RUN=false
-[[ "${1:-}" == "--dry-run" ]] && DRY_RUN=true
+case "${1:-}" in
+  "")         ;;
+  --dry-run)  DRY_RUN=true ;;
+  *)          printf '%s\n' "✗ 未知参数:$1(只支持 --dry-run)。拼错的参数不应被当作正常安装" >&2; exit 1 ;;
+esac
 
 n_linked=0 n_skipped=0 n_backed_up=0
-N_STEPS=6 step=0
+# 总步数从本文件里 next_step 的调用次数自动数出来,不手维护(加/删一节自动跟上)
+N_STEPS=$(grep -c '^next_step ' "$SELF" || true)
+step=0
 
 say()  { printf '%s\n' "$*"; }
-run()  { if $DRY_RUN; then say "    [dry-run] $*"; else eval "$@"; fi; }
+# run 接受 argv(不是拼接的字符串):含空格或单引号的路径也安全,不走 eval
+run()  { if $DRY_RUN; then say "    [dry-run] $*"; else "$@"; fi; }
 # 步骤计数器:加/删一节只改 N_STEPS,不用逐处改 [N/6]
-next_step() { step=$((step + 1)); say "[$step/$N_STEPS] $*"; }
+next_step() {
+  step=$((step + 1))
+  if [[ "$N_STEPS" -gt 0 ]]; then say "[$step/$N_STEPS] $*"; else say "[$step] $*"; fi
+}
 
 # link_file <源(相对REPO_DIR)> <目标绝对路径>
 link_file() {
@@ -56,29 +80,43 @@ link_file() {
   if [[ -e "$dest" || -L "$dest" ]]; then
     if [[ -L "$dest" ]]; then
       say "  ↻ $name(重链:旧指向 $(readlink "$dest"))"
-      run "rm -f '$dest'"
+      run rm -f "$dest"
     else
       # 备份路径 = <来源根>/<目标相对结构>,如 claude/commands/brain.md、codex/agents/x.toml。
       # 必须带来源前缀:两个根下可能有同名文件(如 AGENTS.md),拍平会互相覆盖。
-      local rel root
+      local rel
       case "$dest" in
-        "$CLAUDE_DIR"/*) root=claude; rel="${dest#"$CLAUDE_DIR"/}" ;;
-        "$CODEX_DIR"/*)  root=codex;  rel="${dest#"$CODEX_DIR"/}"  ;;
-        *)               root=other;  rel="$(basename "$dest")"    ;;
+        "$CLAUDE_DIR"/*) rel="claude/${dest#"$CLAUDE_DIR"/}" ;;
+        "$CODEX_DIR"/*)  rel="codex/${dest#"$CODEX_DIR"/}"  ;;
+        *) say "  ✗ $name — 目标 $dest 不在已知根下,跳过(拒绝拍平路径导致覆盖)"; return 0 ;;
       esac
-      rel="$root/$rel"
       say "  ⚑ $name(备份原文件 → ${BACKUP_DIR#"$HOME"/}/$rel)"
-      run "mkdir -p '$BACKUP_DIR/$(dirname "$rel")'"
-      run "mv '$dest' '$BACKUP_DIR/$rel'"
+      run mkdir -p "$BACKUP_DIR/$(dirname "$rel")"
+      run mv "$dest" "$BACKUP_DIR/$rel"
       n_backed_up=$((n_backed_up + 1))
     fi
   else
     say "  + $name"
   fi
 
-  run "mkdir -p '$(dirname "$dest")'"
-  run "ln -s '$src' '$dest'"
+  run mkdir -p "$(dirname "$dest")"
+  run ln -s "$src" "$dest"
   n_linked=$((n_linked + 1))
+}
+
+# link_dir <源目录(相对REPO_DIR)> <glob> <目标目录绝对路径>
+# 把源目录下匹配 glob 的每个条目逐个 link 到目标目录同名位置
+link_dir() {
+  local srcRel="$1" pattern="$2" destDir="$3"
+  if [[ ! -d "$REPO_DIR/$srcRel" ]]; then
+    say "  ⚠ 跳过 — $srcRel/ 不存在"
+    return 0
+  fi
+  local f
+  for f in "$REPO_DIR/$srcRel"/$pattern; do
+    [[ -e "$f" ]] || continue
+    link_file "$srcRel/$(basename "$f")" "$destDir/$(basename "$f")"
+  done
 }
 
 say "==> minion-knowledge-base → ~/.claude + ~/.codex"
@@ -96,12 +134,7 @@ say
 
 # ---- 2. commands ----
 next_step "斜杠命令 commands/"
-if [[ -d "$REPO_DIR/base/commands" ]]; then
-  for f in "$REPO_DIR/base/commands"/*.md; do
-    [[ -e "$f" ]] || continue
-    link_file "base/commands/$(basename "$f")" "$CLAUDE_DIR/commands/$(basename "$f")"
-  done
-fi
+link_dir "base/commands" "*.md" "$CLAUDE_DIR/commands"
 say
 
 # ---- 3. KB skills ----
@@ -120,7 +153,7 @@ say
 next_step "mattpocock skills(外部依赖)"
 if [[ -d "$MP_SKILLS_DIR" ]]; then
   count=$(find "$MP_SKILLS_DIR" -maxdepth 2 -name SKILL.md 2>/dev/null | wc -l | tr -d ' ')
-  say "  ✓ 已安装($count 个,位于 ${MP_SKILLS_DIR#$HOME/})"
+  say "  ✓ 已安装($count 个,位于 ${MP_SKILLS_DIR#"$HOME"/})"
   # 确保它们在 ~/.claude/skills 里有发现入口
   missing=0
   for d in "$MP_SKILLS_DIR"/*/; do
@@ -143,31 +176,17 @@ say
 # 放着不改变编排行为,只在 description 匹配时才派发。这样与 mattpocock skills
 # 自带的编排规则(双轴并行、design-it-twice)不冲突:skill 有自己编排时走 skill 的。
 next_step "子代理定义 agents/(Claude)"
-if [[ -d "$REPO_DIR/base/agents" ]]; then
-  for f in "$REPO_DIR/base/agents"/*.md; do
-    [[ -e "$f" ]] || continue
-    link_file "base/agents/$(basename "$f")" "$CLAUDE_DIR/agents/$(basename "$f")"
-  done
-else
-  say "  ⚠ 跳过 — base/agents/ 不存在"
-fi
+link_dir "base/agents" "*.md" "$CLAUDE_DIR/agents"
 say
 
 # ---- 6. Codex 子代理定义 ----
 next_step "子代理定义 agents/(Codex)"
-if [[ -d "$REPO_DIR/base/codex-agents" ]]; then
-  for f in "$REPO_DIR/base/codex-agents"/*.toml; do
-    [[ -e "$f" ]] || continue
-    link_file "base/codex-agents/$(basename "$f")" "$CODEX_DIR/agents/$(basename "$f")"
-  done
-else
-  say "  ⚠ 跳过 — base/codex-agents/ 不存在"
-fi
+link_dir "base/codex-agents" "*.toml" "$CODEX_DIR/agents"
 say
 
 say "==> 完成:$n_linked 个链接,$n_skipped 个已存在,$n_backed_up 个原文件已备份"
 [[ $n_backed_up -gt 0 ]] && say "    备份位置:$BACKUP_DIR"
 $DRY_RUN && say "    (dry-run:未实际修改任何东西)"
 say
-say "    验证:ls -la ~/.claude/CLAUDE.md ~/.claude/agents/ ~/.codex/AGENTS.md ~/.codex/agents/"
+say "    验证:ls -la $CLAUDE_DIR/CLAUDE.md $CLAUDE_DIR/agents/ $CODEX_DIR/AGENTS.md $CODEX_DIR/agents/"
 say "    Claude Code 里跑 /help 或 /brain 确认命令可用;/agents 确认子代理已加载"

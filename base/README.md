@@ -20,8 +20,8 @@
 base/
 ├── CLAUDE.md        → ~/.claude/CLAUDE.md        全局偏好(Claude Code 入口)
 ├── AGENTS.md        → ~/.codex/AGENTS.md         全局偏好(Codex 入口)
-├── agents/          → ~/.claude/agents/*.md      六角色子代理定义(Claude)
-├── codex-agents/    → ~/.codex/agents/*.toml     六角色子代理定义(Codex)
+├── agents/          → ~/.claude/agents/*.md      子代理定义 ×5(Claude)
+├── codex-agents/    → ~/.codex/agents/*.toml     子代理定义 ×5(Codex)
 └── commands/        → ~/.claude/commands/*
     ├── brain.md         /brain          跨项目全局总览(读 minion-brain app)
     ├── idea.md          /idea           一句话捕获 idea 进 Inbox
@@ -56,14 +56,7 @@ wiki/projects/<repo>.md ← 大脑层:项目为什么存在、架构决策、跨
 
 ### 因此:新机器需手配的项(已知缺口)
 
-上面两个 config 文件不随 repo 走,所以 `init.sh` 装完后**子代理定义就位、但模型解析仍是默认值**。新机器需手动补(细节见 [agent-orchestration.md](../wiki/conventions/agent-orchestration.md)):
-
-| 文件 | 需补什么 | 不补的后果 |
-|---|---|---|
-| `~/.claude/settings.json` | `availableModels` 加裸别名(`opus`/`sonnet`/`haiku`/`fable`)+ 各别名解析出的全 ID | 子代理的 `model:` 被**静默替换**成继承模型 |
-| 同上 | `ANTHROPIC_DEFAULT_*_MODEL` 按需 pin(注意原生 1M 的 Sonnet 5 / Fable 5 **不加** `[1m]`) | Bedrock 上 `sonnet` 落到 Sonnet 4.5 / 200K |
-| `~/.codex/config.toml` | `[model_providers.amazon-bedrock.aws]` 的 `profile` | 退到过期静态凭证 → 401,`mwinit` 救不了 |
-| 同上 | `[agents]` 的 `default_subagent_model` / `..._reasoning_effort` | 子代理 model 无兜底,代际升级要逐个文件改 |
+上面两个 config 文件不随 repo 走,所以 `init.sh` 装完后**子代理定义就位、但模型解析仍是默认值**——四项需手配(`settings.json` 的 `availableModels` 与 `ANTHROPIC_DEFAULT_*_MODEL`、`config.toml` 的 bedrock `profile` 与 `[agents]` 默认值)。**每项该填什么、不填的后果,见 [agent-orchestration.md](../wiki/conventions/agent-orchestration.md)「静默失败陷阱」与「代际适配方法」。**
 
 这是**有意的取舍**:让这四项随 repo 走需要引入配置合并机制,违反 MVP 极简主义(能用文件+版本控制+文档规则解决的就不建系统)。改为文档化 + `kb-lint` 事后查。
 

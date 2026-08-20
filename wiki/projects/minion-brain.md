@@ -38,8 +38,8 @@ timestamp: 2026-08-03T00:00:00Z
 ## Lessons learned
 
 - **Claude Code 的项目级配置由 cwd 唯一决定**。曾设想"从 minion-brain 起一个实例、cd 到别的 repo 就能共用它的 CLAUDE.md/skills"——**行不通**。cd 之后只读 `~/.claude/` + 目标 repo 自己的配置。共用的东西必须落在全局层。
-- **停用了四子代理编排**(`deep-reasoner`/`peer-review`/`fast-worker`/`verifier` + SUBAGENTS.md)。原因:开发以 mattpocock skills 为主,那套 skill 自带编排规则(双轴并行、design-it-twice),两套叠加产生歧义。原文存于 KB `archive/subagents/`,含恢复方法。
+- **四子代理编排曾于 2026-08-03 停用,2026-08-12 恢复并扩展**。停用原因是 `@SUBAGENTS.md` 无条件全局加载,与 mattpocock skills 自带编排规则(双轴并行、design-it-twice)叠加产生歧义;恢复的解法是**只分发 agent 定义、不加无条件引用**(声明式定义放着不改变编排行为)。现行规范见 [多模型编排规范](../conventions/agent-orchestration.md);停用期的原文仍留在 `archive/subagents/`(软删除)。
 
 ## 待处理
 
-`master` 工作区有一批未提交改动(memory 层的 PRD/设计文档、diagrams、`docs/agents/` 的 issue-tracker/triage/domain 配置)。其中 SUBAGENTS.md 与 4 个 agent 定义已归档进 KB,不再随 app 走。
+`master` 工作区有一批未提交改动(memory 层的 PRD/设计文档、diagrams、`docs/agents/` 的 issue-tracker/triage/domain 配置)。其中 SUBAGENTS.md 与 4 个 agent 定义已移交 KB(现由 `base/agents/` + `base/codex-agents/` 管理并分发),不再随 app 走。

@@ -12,3 +12,4 @@ Rules:
 - If the task requires judgment or architecture decisions, stop and report back instead of improvising.
 - Verify your work (run tests/lint if available) before reporting done.
 - Report results in 1-3 sentences.
+- Do not delegate to further subagents.

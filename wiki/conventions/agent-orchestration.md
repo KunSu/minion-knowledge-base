@@ -73,7 +73,7 @@ Codex 侧 `Explore` 的对等角色叫 `scanner`(`Explore` 是 Claude 内置名,
 
 ## 静默失败陷阱(2026-08-12 实测确认)
 
-三个都**不报错**。共同的验证纪律:**读 transcript 里的真实 `message.model` 字段,别信子代理自报**——它常报成继承来的模型。
+四个都**不报错**。共同的验证纪律:**读 transcript 里的真实 `message.model` 字段,别信子代理自报**——它常报成继承来的模型。
 
 ```bash
 cd /tmp/probe && claude -p --agents '{"p":{"description":"probe","prompt":"Reply: OK","model":"haiku","tools":[]}}' "Dispatch p."
@@ -90,11 +90,36 @@ cd /tmp/probe && claude -p --agents '{"p":{"description":"probe","prompt":"Reply
 - Midway cookie 过期(~2 小时)→ `mwinit -o`
 - 凭证链走错 profile → 查 `~/.aws/config` 的 `credential_process`,用 `AWS_PROFILE=<name> aws sts get-caller-identity` 二分定位
 
+**4. `[agents]` 默认值缺失会让 `fast-worker` 跑到最贵档。** 它刻意不写 `model`/`effort` 靠继承(见映射表),所以 `~/.codex/config.toml` 的 `[agents]` **必须存在且等于 terra/low**。缺了就继承主会话 = `sol/medium` ——最贵的档,意图的反面,且不报错。这是「省一处维护」换来的代价:新机器必须配这一项(见 [base/README.md](../../base/README.md)「新机器需手配的项」)。
+
+## 为什么两侧各写一份(不共用正文)
+
+两个 harness 的 agent 格式**互不兼容**:Claude 吃 Markdown + YAML frontmatter(正文即 body),Codex 吃独立 TOML(正文在 `developer_instructions` 内联字符串)。都不支持从外部文件 include 正文。
+
+行为约束正文实测重叠 95%(verifier)/ 86%(deep-reasoner)/ 79%(fast-worker),但 **`peer-review` 只有 18%、`Explore`↔`scanner` 49%** —— 后两个的差异是真实职责差异,不是重复:
+
+- `peer-review`:Claude 侧那份的核心是「怎么 shell 出去调 Codex 取第二意见」;Codex 侧**自己就是那个第二视角**,不能再调自己。
+- `Explore`↔`scanner`:Codex 侧有 Luna 的 leaf-only 能力边界,Claude 侧的 haiku 没有;Claude 侧有「覆盖内置 Explore」的说明,Codex 侧没有内置可覆盖。
+
+**决策(2026-08-12):保持两份手写,不引入生成步骤。** 抽共享正文需要构建脚本 + 衍生产物,违反 MVP 极简主义;而角色固定为 6 个(其中主会话不落文件,两侧各 5 个定义文件)、正文改动频率极低(七月定稿至今只因 model 行动过)。**代价由 `kb-lint` 检查项 8 承担** —— 手同步的漂移必须靠 lint 兜住,这是本决策成立的前提。
+
+若某天手同步成了负担,再上生成器 —— 那时它是被需求推出来的,不是预先设计的。
+
 ## 代理定义要点
 
 - 定义文件在 `base/agents/`(Claude)与 `base/codex-agents/`(Codex),由 `scripts/init.sh` symlink 到 `~/.claude/agents/` 和 `~/.codex/agents/`。项目级同名覆盖全局。
 - **只分发定义,不加无条件引用**。subagent 定义是声明式的:放着不改变编排行为,只在 `description` 匹配时才派发。这样与 mattpocock skills 自带的编排规则(`/code-review` 双轴、`/design-an-interface` design-it-twice)不冲突——skill 有自己编排时走 skill 的,没有时才落到这六个角色。(2026-08-03 停用旧版就是因为 `@SUBAGENTS.md` 无条件全局加载产生歧义,见 `archive/README.md`。)
-- Claude 侧均不限制 `tools`(保留 shell/脚本能力),靠 prompt 约束行为;Codex 侧 `peer-review`/`verifier`/`scanner` 加 `sandbox_mode = "read-only"`。
+- **只读角色靠机制约束,不靠 prompt 措辞。** 覆盖内置 `Explore` 时若不写 `tools`,会把内置的只读约束一并解掉,静默拿到写权限。
+- **但两侧只读强度不等价**:Codex 的 `sandbox_mode = "read-only"` 是运行时强制;Claude 的 `tools` 白名单只是不给写工具,**白名单里一旦有 `Bash`,只读就是空话**(可 `sh -c "echo > f"`)。所以 `Explore` 的白名单刻意不含 `Bash`——`Read`/`Glob`/`Grep` 足够定位代码。
+- 其余四个角色(`deep-reasoner`/`fast-worker`/`verifier`/`peer-review`)**不限制写权限**,靠 prompt 约束行为:
+  - `verifier` 要跑 build/test,那些必须写文件——用只读沙箱会把 build 一起挡掉,所以两侧都不设。它的约束是「不改被审查的变更」。
+  - `peer-review` 要能起原型验证替代方案,同理。
+  - 只有 `Explore`/`scanner` 是真只读角色(前者靠 `tools` 白名单,后者靠 `sandbox_mode`)。
+- **四个角色两侧都写「不再向下派发」**(`deep-reasoner`/`fast-worker`/`verifier`/`peer-review`):嵌套委派会让编排失控且难追踪。Codex 侧写在 `developer_instructions`,Claude 侧写在正文 Rules。`Explore`/`scanner` 不需要这条——前者白名单里没有 Agent 工具,后者的 leaf-only 条款更严,两者机制上就派不出去。
+- **跨 harness 互调取第二视角**(双向):Claude 侧的 `peer-review` shell 出去调 `codex exec`;Codex 侧的 `verifier` 反过来调 `claude -p --model sonnet --effort high`。两个方向都靠独立进程保证视角独立(看不到对方的 CLAUDE.md/skills),对方不可用时**必须显式声明,禁止编造**。
+  - **两个方向的代价不对称**:Claude→Codex 零成本(Claude 侧无沙箱限制、凭证已在环境里)。Codex→Claude **需要放宽 Codex 沙箱**,两层原因实测确认:①Claude Code 启动要写 `~/.claude/settings.json`,默认与 `workspace-write` 沙箱都拒绝;②即使放开该路径,Bedrock 模式下还要跑 toolbox 换 STS 凭证,那要伸到沙箱外。已验证可行的是最宽的那档;更窄的组合(`workspace-write` + 只读全盘 + `~/.claude` 可写)未验证,应优先试。
+  - **Owner 于 2026-08-12 在知悉代价后选择保留这个方向**(为了让 Codex 的验证结论也过一遍 Claude 复核)。这是**有意的取舍,不是缺陷**——后续审查不要当 bug 删掉。约束:放宽只发生在**父进程启动时**,子代理自己不得放宽;未获放宽时报 "Claude unavailable: sandbox denied" 而不是绕路。
+  - 替代方案(当时评估过、未采用):由编排者串行派两侧 `verifier` 再自行汇总,不需要任何权限放宽。若哪天觉得沙箱代价不值,回到这个方案。
 - `peer-review` 跑在 Sonnet 上、经 Codex CLI 取第二意见(`codex` 不是合法 Claude model 值)。其价值来自**视角独立**(独立进程,看不到 Claude 的 CLAUDE.md/skills),不来自模型规格——所以用 terra/high 而非 sol。Codex 不可用时**必须显式声明,禁止编造**。
 - `verifier` 只返回 PASS/FAIL + 证据,不做修复。
 
@@ -125,6 +150,14 @@ cd /tmp/probe && claude -p --agents '{"p":{"description":"probe","prompt":"Reply
 
 ## Amazon 环境提示
 
-`codex exec` 或 Claude Code 报 401 / 403 / "security token expired" / "Could not load credentials" 是 **Midway 过期**,不是 OAuth 问题——`/login` 在 3P provider 模式下不可用,跑 `mwinit -o` 重试。Midway cookie 有效期约 2 小时。
+`codex exec` 或 Claude Code 报 401 / 403 / "security token expired" / "Could not load credentials" 通常是 **Midway 过期**,不是 OAuth 问题——`/login` 在 3P provider 模式下不可用,跑 `mwinit -o` 重试。Midway cookie 有效期约 2 小时。**`mwinit` 刷了还报 401 就是凭证链走错 profile**(见上「静默失败陷阱」#3)。
 
-429 在 Bedrock 上分两种:`Too many requests`(请求数)和 `Too many tokens`(每分钟吞吐,更常见)。配额按模型分池,所以把 Explore / 机械任务下沉到 haiku/luna 不只省钱,也是把负载分到不同配额池。
+429 在 Bedrock 上分两种,对应**两个独立令牌桶**(按 `账号 × region × 模型` 维护,独立检查):`Too many requests`(RPM,与请求大小无关)和 `Too many tokens`(TPM)。**实测近 8 天 12 次真实 429 里 11 次是 RPM**——所以请求大小不是主因,`[1m]` 也不是触发器。
+
+配额按模型分池,这带来两条可操作的结论:
+- **`fallbackModel` 首位放另一个模型族**(如 Sonnet 5),限流时才能降级到**未被争用的桶**;放另一个 Opus 等于换到同族的拥挤桶。
+- 把 Explore / 机械任务下沉到 haiku/luna 不只省钱,也是把负载分到不同配额池。
+
+**实测发现 429 与自身负载反相关**:12 次全部落在 09:47–15:11 PDT,而该时段吞吐比零事故的深夜时段**轻 7–10 倍**,6/12 次发生在「前 60 秒一个请求都没发」时。强推断是共享配额在太平洋工作时段被其他租户争用(账号是否多租户共享未直接核验)。**最强杠杆是把重活挪出 09:00–15:00 PDT**,配置只能做优雅降级。
+
+**prompt cache 的真实成本来自 5 分钟 TTL 到期**:Claude Code 只用 5 分钟档(`ephemeral_1h = 0`)。按距同 session 上一请求的间隔分组,5 分钟处是干净阶跃——间隔 >5min 的请求平均 cache_creation 从 4k 跳到 187k(>30min 则 352k)。**3% 的请求制造了约 30% 的缓存写入量**:多 session 轮转时每个 session 空转超 5 分钟就 TTL 到期,下一轮按 1.25× 重写整个约 35 万 token 前缀。
