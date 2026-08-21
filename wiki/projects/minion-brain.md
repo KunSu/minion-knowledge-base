@@ -38,7 +38,7 @@ timestamp: 2026-08-19T00:00:00Z
 ## Lessons learned
 
 - **Claude Code 的项目级配置由 cwd 唯一决定**。曾设想"从 minion-brain 起一个实例、cd 到别的 repo 就能共用它的 CLAUDE.md/skills"——**行不通**。cd 之后只读 `~/.claude/` + 目标 repo 自己的配置。共用的东西必须落在全局层。
-- **四子代理编排曾于 2026-08-03 停用,2026-08-12 恢复并扩展**。停用原因是 `@SUBAGENTS.md` 无条件全局加载,与 mattpocock skills 自带编排规则(双轴并行、design-it-twice)叠加产生歧义;恢复的解法是**只分发 agent 定义、不加无条件引用**(声明式定义放着不改变编排行为)。现行规范见 [多模型编排规范](../conventions/agent-orchestration.md);停用期的原文已于 2026-08-19 从 `archive/` 移除(编排既已恢复,该存档不再有现实用途),需要时从 git history 取回:`git log --diff-filter=D --oneline -- archive/`。
+- **四子代理编排曾于 2026-08-03 停用,2026-08-12 恢复并扩展**。停用原因是 `@SUBAGENTS.md` 无条件全局加载,与 mattpocock skills 自带编排规则(双轴并行、design-it-twice)叠加产生歧义;恢复的解法是**只分发 agent 定义、不加无条件引用**(声明式定义放着不改变编排行为)。现行规范见 [多模型编排规范](../conventions/agent-orchestration.md);停用期的原文已于 2026-08-19 连同 `archive/` 一并删除(编排既已恢复,该存档不再有现实用途)。注意该目录是在同一批变更里引入又删除的,且合并走 squash,**所以这些原文不在 master 历史里**;要回看得去 [PR #4](https://github.com/KunSu/minion-knowledge-base/pull/4) 中删除那个 commit 之前的版本(远端分支 `fix/orchestration-review-findings` 为此保留未删)。
 
 ## 待处理
 
