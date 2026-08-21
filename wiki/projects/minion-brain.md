@@ -4,7 +4,7 @@ title: minion-brain
 description: 第二大脑的 Web App(Next.js + Supabase)—— Inbox/待办/AI 任务队列的产品实现,不是配置中枢
 resource: https://minion-brain.vercel.app
 tags: [nextjs, supabase, second-brain, app]
-timestamp: 2026-08-03T00:00:00Z
+timestamp: 2026-08-19T00:00:00Z
 ---
 
 # minion-brain
@@ -38,7 +38,7 @@ timestamp: 2026-08-03T00:00:00Z
 ## Lessons learned
 
 - **Claude Code 的项目级配置由 cwd 唯一决定**。曾设想"从 minion-brain 起一个实例、cd 到别的 repo 就能共用它的 CLAUDE.md/skills"——**行不通**。cd 之后只读 `~/.claude/` + 目标 repo 自己的配置。共用的东西必须落在全局层。
-- **四子代理编排曾于 2026-08-03 停用,2026-08-12 恢复并扩展**。停用原因是 `@SUBAGENTS.md` 无条件全局加载,与 mattpocock skills 自带编排规则(双轴并行、design-it-twice)叠加产生歧义;恢复的解法是**只分发 agent 定义、不加无条件引用**(声明式定义放着不改变编排行为)。现行规范见 [多模型编排规范](../conventions/agent-orchestration.md);停用期的原文仍留在 `archive/subagents/`(软删除)。
+- **四子代理编排曾于 2026-08-03 停用,2026-08-12 恢复并扩展**。停用原因是 `@SUBAGENTS.md` 无条件全局加载,与 mattpocock skills 自带编排规则(双轴并行、design-it-twice)叠加产生歧义;恢复的解法是**只分发 agent 定义、不加无条件引用**(声明式定义放着不改变编排行为)。现行规范见 [多模型编排规范](../conventions/agent-orchestration.md);停用期的原文已于 2026-08-19 从 `archive/` 移除(编排既已恢复,该存档不再有现实用途),需要时从 git history 取回:`git log --diff-filter=D --oneline -- archive/`。
 
 ## 待处理
 

@@ -108,7 +108,7 @@ cd /tmp/probe && claude -p --agents '{"p":{"description":"probe","prompt":"Reply
 ## 代理定义要点
 
 - 定义文件在 `base/agents/`(Claude)与 `base/codex-agents/`(Codex),由 `scripts/init.sh` symlink 到 `~/.claude/agents/` 和 `~/.codex/agents/`。项目级同名覆盖全局。
-- **只分发定义,不加无条件引用**。subagent 定义是声明式的:放着不改变编排行为,只在 `description` 匹配时才派发。这样与 mattpocock skills 自带的编排规则(`/code-review` 双轴、`/design-an-interface` design-it-twice)不冲突——skill 有自己编排时走 skill 的,没有时才落到这六个角色。(2026-08-03 停用旧版就是因为 `@SUBAGENTS.md` 无条件全局加载产生歧义,见 `archive/README.md`。)
+- **只分发定义,不加无条件引用**。subagent 定义是声明式的:放着不改变编排行为,只在 `description` 匹配时才派发。这样与 mattpocock skills 自带的编排规则(`/code-review` 双轴、`/design-an-interface` design-it-twice)不冲突——skill 有自己编排时走 skill 的,没有时才落到这六个角色。(2026-08-03 停用旧版就是因为 `@SUBAGENTS.md` 无条件全局加载产生歧义。)
 - **只读角色靠机制约束,不靠 prompt 措辞。** 覆盖内置 `Explore` 时若不写 `tools`,会把内置的只读约束一并解掉,静默拿到写权限。
 - **但两侧只读强度不等价**:Codex 的 `sandbox_mode = "read-only"` 是运行时强制;Claude 的 `tools` 白名单只是不给写工具,**白名单里一旦有 `Bash`,只读就是空话**(可 `sh -c "echo > f"`)。所以 `Explore` 的白名单刻意**不含 `Bash`**,其余沿用内置 Explore 的只读工具集:`Read`/`Glob`/`Grep`/`WebFetch`/`WebSearch`/`TodoWrite`(六个,定位代码够用且都不写本地文件)。
 - 其余四个角色(`deep-reasoner`/`fast-worker`/`verifier`/`peer-review`)**不限制写权限**,靠 prompt 约束行为:
