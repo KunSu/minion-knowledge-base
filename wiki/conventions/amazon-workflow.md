@@ -4,7 +4,7 @@ title: Amazon 工作规范
 description: Amazon 内部工作时的生产安全铁律、构建系统入口与包容性语言约定(amazon scope,与个人 convention 分开)
 scope: amazon
 tags: [amazon, aws, brazil, production-safety]
-timestamp: 2026-07-11T00:00:00Z
+timestamp: 2026-08-19T00:00:00Z
 ---
 
 # Amazon 工作规范
@@ -47,3 +47,15 @@ timestamp: 2026-07-11T00:00:00Z
 | blacklist | denylist, blocklist, exclusion list |
 | whiteday(s) | clear day(s), allowed day(s) |
 | blackday(s) | blocked day(s) |
+
+## Bedrock 上的编排环境(Midway / 429 / prompt cache)
+
+> 2026-08-19 从 [多模型编排规范](agent-orchestration.md) 搬来。那页是 `scope: personal` 且每次派子代理都会加载,这些 Amazon 专属细节留在那里等于个人项目也照单加载。编排本身的规则(角色→模型映射、硬边界)仍在那页。
+
+**401 / 403 / "security token expired" / "Could not load credentials" 通常是 Midway 过期**,不是 OAuth 问题——`/login` 在 3P provider 模式下不可用,跑 `mwinit -o` 重试。Midway cookie 有效期约 2 小时。**`mwinit` 刷了还报 401 就是凭证链走错 profile**(见 [agent-orchestration](agent-orchestration.md)「静默失败陷阱」#3)。这两条成因对 Claude Code 和 Codex 都适用,不是 Codex 专有。
+
+429 在 Bedrock 上分两种,对应**两个独立令牌桶**(按 `账号 × region × 模型` 维护,独立检查):`Too many requests`(RPM,与请求大小无关)和 `Too many tokens`(TPM)。**实测近 8 天 12 次真实 429 里 11 次是 RPM**——所以请求大小不是主因,`[1m]` 也不是触发器。
+
+**实测发现 429 与自身负载反相关**:12 次全部落在 09:47–15:11 PDT,而该时段吞吐比零事故的深夜时段**轻 7–10 倍**,6/12 次发生在「前 60 秒一个请求都没发」时。强推断是共享配额在太平洋工作时段被其他租户争用(账号是否多租户共享未直接核验)。**最强杠杆是把重活挪出 09:00–15:00 PDT**,配置只能做优雅降级(降级手段见编排页的模型分池两条)。
+
+**prompt cache 的真实成本来自 5 分钟 TTL 到期**:Claude Code 只用 5 分钟档(`ephemeral_1h = 0`)。按距同 session 上一请求的间隔分组,5 分钟处是干净阶跃——间隔 >5min 的请求平均 cache_creation 从 4k 跳到 187k(>30min 则 352k)。**3% 的请求制造了约 30% 的缓存写入量**:多 session 轮转时每个 session 空转超 5 分钟就 TTL 到期,下一轮按 1.25× 重写整个约 35 万 token 前缀。
