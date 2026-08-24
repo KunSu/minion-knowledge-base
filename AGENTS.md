@@ -14,6 +14,7 @@
 
 | 你要做什么 | 读这个 |
 |---|---|
+| 拿到空结果 / 被问「你能不能做 X」/ 收尾一批操作 / 撞上认证墙 | `wiki/conventions/verification-discipline.md`(不带 scope,所有项目所有 harness 都适用) |
 | 了解 KB 结构 / 四个操作 / frontmatter 模板 / 完整铁律 | `README.md` |
 | 执行某个 kb 操作(ingest/query/remember/lint)或 awake | 对应 `skills/<name>/SKILL.md` 完整规程 |
 | 派子代理 / 并行分工 / 多模型编排 / 换模型档位(deep-reasoner / peer-review / fast-worker / verifier / Explore·scanner / Claude+Codex 双侧路由) | `wiki/conventions/agent-orchestration.md` |
