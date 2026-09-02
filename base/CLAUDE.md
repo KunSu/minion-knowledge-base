@@ -33,6 +33,7 @@
   - 只涉及非指令层(projects / knowledge)→ 可 auto commit。
   - 触及指令层(preferences / conventions / goals)或策略文件(PRD / README / AGENTS / CLAUDE / SKILL)→ 整批须我明说「可以 commit」才 commit。
   - **push 任何情况下不得自行做**,一律等我明确指示。
+- **Session 产物进 `tmp/`**:session 生成、不打算 commit 的脚本和中间产物,一律放项目 root 下的 `tmp/`(没有就建);root 只留正式交付物和策略文件。
 - **软删除文化**:不硬删数据,用显式取代关系标记,历史靠版本控制保留。
 
 ## 开发工作流
