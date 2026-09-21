@@ -39,6 +39,7 @@
 
 - **skills 以 [mattpocock/skills](https://github.com/mattpocock/skills) 为主**。它们装在 `~/.agents/skills/`,通过 symlink 在 `~/.claude/skills/` 全局可用。skill 显式规定了子代理编排方式时(如 `/code-review` 的 Standards+Spec 双轴、`/design-an-interface` 的 design-it-twice),遵循 skill 自己的编排结构。
 - **进某 repo 开发前**,若 `minion-knowledge-base/wiki/projects/<repo>.md` 存在,先读它拿项目背景(为什么存在、架构决策、lessons learned、与其他项目的关系)。该 repo 自己的 `CLAUDE.md`/`AGENTS.md`/`docs/` 负责技术栈与构建约定。
+- **干 Amazon 相关的活前**(AWS / Brazil / 内部系统 / Cloud Desktop `cdd` 的 main·adhoc endpoint 路由),读 `minion-knowledge-base/wiki/conventions/amazon-workflow.md`(`scope: amazon`);个人项目不必加载。
 
 ## 模型 / effort
 
