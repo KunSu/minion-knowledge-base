@@ -17,7 +17,7 @@
 - [多模型编排规范](wiki/conventions/agent-orchestration.md) — **已恢复并扩展(2026-08-12)**。六角色分层路由,Claude Code + Codex 双侧对等;三档语义映射 + 代际适配方法;Luna leaf-only 与不做 Sol 例行扇出两条硬边界。2026-08-03 的停用原因(与 mattpocock skills 编排叠加有歧义)已解:只分发 agent 定义、不加无条件引用
 
 **公司 conventions**(Amazon 内部环境专用,与个人 conventions 分开):
-- [Amazon 工作规范](wiki/conventions/amazon-workflow.md) — 生产安全铁律、Brazil/CRUX/Coral 等内部系统入口、包容性语言
+- [Amazon 工作规范](wiki/conventions/amazon-workflow.md) — 生产安全铁律、Brazil/CRUX/Coral 等内部系统入口、Cloud Desktop(`cdd`)的 main/adhoc endpoint 路由(默认 main,adhoc 须显式点名——两台 tmux session 同名,走错是静默错答案)、包容性语言
 
 ## Goals(长期目标 ★指令层)
 

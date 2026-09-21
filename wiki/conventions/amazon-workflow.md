@@ -1,10 +1,10 @@
 ---
 type: convention
 title: Amazon 工作规范
-description: Amazon 内部工作时的生产安全铁律、构建系统入口与包容性语言约定(amazon scope,与个人 convention 分开)
+description: Amazon 内部工作时的生产安全铁律、构建系统入口、Cloud Desktop(cdd)endpoint 路由与包容性语言约定(amazon scope,与个人 convention 分开)
 scope: amazon
-tags: [amazon, aws, brazil, production-safety]
-timestamp: 2026-07-11T00:00:00Z
+tags: [amazon, aws, brazil, production-safety, cloud-desktop]
+timestamp: 2026-09-21T00:00:00Z
 ---
 
 # Amazon 工作规范
@@ -34,6 +34,33 @@ timestamp: 2026-07-11T00:00:00Z
 - **BuilderHub** — 建包/建应用/建 Cloud Desktop 的门户。
 - **AWS CX Builder Hub** — https://hub.cx.aws.dev/ ,AWSCX 团队专用门户。
 - 任何含 `amazon` 的 hostname、以及 `a2z.com` / `aws.dev` 域名 → 用 `ReadInternalWebsites`(需 Midway 认证),不要用普通 web fetch。
+
+## Cloud Desktop(`cdd`)endpoint 路由
+
+`cdd` 是 Owner 自写的工具(`~/.local/bin/cdd`,不入库),从 Mac 通过 SSH + tmux 流式驱动远端 Cloud Desktop。**要在 Cloud Desktop 上做事一律用 `cdd`,不要裸 `ssh`**——裸 ssh 拿不到工具链 PATH,也落不到正确工作目录。
+
+它有两个 endpoint,**不对等**:
+
+| endpoint | ssh 别名 | 什么时候用 |
+|---|---|---|
+| **main** | `Host cdd` | **默认。** Owner 说「在 cdd 上跑 X」一律走这台,不加任何 flag |
+| **adhoc** | `Host cdd-adhoc` | **只有 Owner 在那句话里明确提到「adhoc」时**才用 |
+
+```bash
+cdd <子命令>                  # main(默认)
+cdd --adhoc <子命令>          # adhoc,仅此一条
+cdd -e adhoc <子命令>         # 同上(--endpoint 等价)
+CDD_ENDPOINT=adhoc cdd ...    # 整个 shell / 一串命令都走 adhoc
+cdd --main <子命令>           # 上一条已生效时,临时切回 main
+```
+
+**flag 必须放在子命令前面**:`cdd --adhoc ls` 对,`cdd ls --adhoc` 错(后者会报错,不会静默去列 main)。
+
+**为什么必须显式点名、且脚本刻意不做「自动挑一台活着的」**:两台机器上的 tmux session **同名**(都是 `cc-$CLAUDE_CODE_SESSION_ID`),各有独立的 `~/cdd-logs/` 和独立的 Midway cookie。走错机器时 `cdd tail` / `peek` / `kill` 会**静默**指向另一台的另一个任务——不报错,只是答案是错的,属最难查的一类错。宁可报错也不猜。
+
+**操作纪律**:一个任务在哪台起的,后续 `tail` / `peek` / `kill` 就必须带同一个 flag,别中途换。不确定自己在哪台,看每条命令开头往 stderr 打的 `cdd[endpoint → 别名]` 前缀,或 `cdd ls` / `cdd --adhoc ls` 各看一眼。`cdd doctor` 查的是**当前 endpoint** 的连通性与 Midway 时钟,换台要重新查。
+
+换机器只改 `~/.ssh/config` 里对应那个 `Host` 块的 HostName,脚本不动。**主机名只存在于 `~/.ssh/config`**——本 repo 是 public,脚本和本页都不写主机名,这是它能被公开讨论的前提。完整用法 `cdd help`;本机文档在 `tools/cdd/`(已 gitignore)。
 
 ## 包容性语言(代码/注释/文档强制)
 
